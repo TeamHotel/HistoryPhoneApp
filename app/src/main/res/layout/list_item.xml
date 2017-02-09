@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rowTextView"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:textSize="16sp" >
-</TextView>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/list_item_vertical_margin"
+    android:paddingBottom="@dimen/list_item_vertical_margin"
+    android:paddingLeft="@dimen/list_item_horizontal_margin"
+    android:paddingRight="@dimen/list_item_horizontal_margin">
+
+    <ImageView
+        android:id="@+id/artifact_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@mipmap/ic_launcher"
+        android:contentDescription="@string/artifact_image"/>
+
+    <TextView
+        android:id="@+id/artifact_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/artifact_image"
+        android:padding="10dp"
+        android:textSize="16sp" />
+
+</RelativeLayout>

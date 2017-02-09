@@ -1,21 +1,16 @@
 package uk.ac.cam.teamhotel.historyphone;
 
-import android.content.Context;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-/**
- * Created by Harry Graham on 05/02/2017.
- */
+
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MyActivity";
+    private static final String TAG = "MainActivity";
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -26,13 +21,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         viewPager = (ViewPager) findViewById(R.id.ViewPager);
-        viewPager.setAdapter(new CustomAdapter(getSupportFragmentManager(), getApplicationContext()));
         tabLayout = (TabLayout) findViewById(R.id.TabLayout);
+
+        // Set up the tabbed fragment view.
+        viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
-
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
-
-
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
@@ -48,19 +42,21 @@ public class MainActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(tab.getPosition());
             }
         });
-
     }
 
-    private class CustomAdapter extends FragmentPagerAdapter {
-        private String fragments [] = {"Nearby" , "Recent"};
+    /**
+     * Adapter class which provides fragments for the main tabbed layout.
+     */
+    private class TabAdapter extends FragmentPagerAdapter {
+        private String[] titles = { getString(R.string.nearby), getString(R.string.recent) };
 
-        public CustomAdapter(FragmentManager supportFragmentManager, Context applicationContext) {
-            super(supportFragmentManager);
+        TabAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
         }
 
         @Override
         public Fragment getItem(int position) {
-            switch(position){
+            switch(position) {
                 case 0:
                     return new NearbyFragment();
                 case 1:
@@ -72,12 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return fragments.length;
+            return titles.length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return fragments[position];
+            return titles[position];
         }
     }
 }
