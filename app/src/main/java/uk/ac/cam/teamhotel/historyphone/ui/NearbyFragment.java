@@ -1,20 +1,27 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 
 import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
+
+// TODO: Add database integration (Harry is currently looking into this).
+// TODO: Add methods for interacting with bluetooth beacons and pulling the Artifact meta-data dynamically.
 
 public class NearbyFragment extends Fragment {
 
-    public static String[] strings = { "Harry", "Sam" };
+    public static List<Artifact> artifacts = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,14 +29,14 @@ public class NearbyFragment extends Fragment {
         // Inflate a new view with the nearby fragment layout.
         View view = inflater.inflate(R.layout.fragment_nearby, container, false);
 
-        // Populate the list view with objects. TODO: actual objects.
+        // Just for aesthetic example, for now.
+        artifacts.clear();
+        artifacts.add(new Artifact("Harry", "Chat to Harry", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
+        artifacts.add(new Artifact("Sam", "Chat to Sam", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
+
+        // Populate the list view with objects.
         ListView listView = (ListView) view.findViewById(R.id.nearby_list);
-        listView.setAdapter(new ArrayAdapter<>(
-                getActivity(),
-                R.layout.list_item,
-                R.id.artifact_title,
-                strings)
-        );
+        listView.setAdapter(new ArtifactAdapter(getActivity(), artifacts));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
