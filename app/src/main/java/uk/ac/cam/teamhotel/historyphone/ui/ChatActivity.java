@@ -1,8 +1,10 @@
-package uk.ac.cam.teamhotel.historyphone;
+package uk.ac.cam.teamhotel.historyphone.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+
+import uk.ac.cam.teamhotel.historyphone.R;
 
 public class ChatActivity extends AppCompatActivity {
 

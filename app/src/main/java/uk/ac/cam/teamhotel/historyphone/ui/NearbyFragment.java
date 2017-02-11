@@ -1,8 +1,7 @@
-package uk.ac.cam.teamhotel.historyphone;
+package uk.ac.cam.teamhotel.historyphone.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +10,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 
+import uk.ac.cam.teamhotel.historyphone.R;
+
 public class NearbyFragment extends Fragment {
 
     public static String[] strings = { "Harry", "Sam" };
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         // Inflate a new view with the nearby fragment layout.
         View view = inflater.inflate(R.layout.fragment_nearby, container, false);
 
