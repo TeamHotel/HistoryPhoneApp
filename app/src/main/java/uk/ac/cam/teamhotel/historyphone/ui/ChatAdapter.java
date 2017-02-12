@@ -22,7 +22,8 @@ import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 public class ChatAdapter extends ArrayAdapter<ChatMessage> {
 
     public ChatAdapter(Context context, List<ChatMessage> messages) {
-        super(context, R.layout.list_item_message_reply, messages);
+        // resource ID = 0 as custom Adapter already handles this
+        super(context, 0, messages);
     }
 
     @NonNull
@@ -54,7 +55,7 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
             // Set parameters of artifact tile.
             message_text.setText(chatMessage.getMessage_text());
             timestamp.setText(chatMessage.getTimestamp());
-
+            id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
             //TODO: add way of adding the corresponding Artifact picture, if type==0
 
         }

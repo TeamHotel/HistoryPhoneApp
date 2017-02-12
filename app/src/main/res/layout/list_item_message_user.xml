@@ -9,15 +9,25 @@
     android:paddingLeft="@dimen/list_item_horizontal_margin"
     android:paddingRight="@dimen/list_item_horizontal_margin">
 
-    <TextView
-        android:id="@+id/chat_message"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:padding="10dp"
-        android:textSize="16sp" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_toLeftOf="@+id/layout2">
+
+        <TextView
+            android:id="@+id/chat_message"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignLeft="@id/id_image"
+            android:padding="10dp"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
 
     <LinearLayout
+        android:id="@+id/layout2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
