@@ -24,11 +24,17 @@ public class ChatActivity extends AppCompatActivity {
 
         chatMessageList.clear();
         ChatMessage exampleMessage = new ChatMessage();
-        exampleMessage.setFrom_user(true);
+        exampleMessage.setFrom_user(false);
         exampleMessage.setMessage_text("Hello, world.");
         exampleMessage.setTimestamp("sent: 11:00am");
 
+        ChatMessage exampleMessage2 = new ChatMessage();
+        exampleMessage2.setFrom_user(true);
+        exampleMessage2.setMessage_text("Hello, from a user.");
+        exampleMessage2.setTimestamp("sent: 11:01am");
+
         chatMessageList.add(exampleMessage);
+        chatMessageList.add(exampleMessage2);
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         chatMessages.setAdapter(new ChatAdapter(getApplicationContext(),chatMessageList ));

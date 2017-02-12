@@ -10,9 +10,11 @@
     android:paddingRight="@dimen/list_item_horizontal_margin">
 
     <LinearLayout
+        android:id="@+id/layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true">
 
         <ImageView
             android:id="@+id/id_image"
@@ -36,6 +38,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/layout"
             android:padding="10dp"
             android:textSize="16sp" />
 
