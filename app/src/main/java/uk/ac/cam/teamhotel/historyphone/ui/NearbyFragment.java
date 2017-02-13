@@ -35,13 +35,16 @@ public class NearbyFragment extends Fragment {
         artifacts.add(new Artifact("Sam", "Chat to Sam", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
 
         // Populate the list view with objects.
-        ListView listView = (ListView) view.findViewById(R.id.nearby_list);
+        final ListView listView = (ListView) view.findViewById(R.id.nearby_list);
         listView.setAdapter(new ArtifactAdapter(getActivity(), artifacts));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
 
+                //pass artifact name to chat session
+                Artifact currentArtifact = (Artifact) listView.getAdapter().getItem(position);
+                intent.putExtra("ARTIFACT_TITLE", currentArtifact.getName());
                 // TODO: Bundle item id with intent to multiplex chats.
 
                 startActivity(intent);

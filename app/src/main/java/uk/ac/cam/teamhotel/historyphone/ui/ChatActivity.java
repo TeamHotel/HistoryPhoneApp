@@ -1,5 +1,6 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,16 +12,23 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
+import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static final String TAG = "ChatActivity";
+    private static String ARTIFACT_NAME = "null";
 
     public static List<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        //get artifact name passed from previous fragment view
+        ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
+
+        //load in messages from database
+        loadChatListFromDB();
 
         chatMessageList.clear();
         ChatMessage exampleMessage = new ChatMessage();
@@ -44,7 +52,8 @@ public class ChatActivity extends AppCompatActivity {
      * Called when the user taps the send button.
      */
     public void sendMessage(View view) {
-        // TODO: add ChatMessage object to DB.
+
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
 
         //get the text field view
         EditText editText = (EditText) findViewById(R.id.enterText);
@@ -54,16 +63,21 @@ public class ChatActivity extends AppCompatActivity {
         newMessage.setMessage_text(editText.getText().toString());
         newMessage.setFrom_user(true);
 
+        dbHelper.addMessage(newMessage, ARTIFACT_NAME );
         //reset the text view to empty
         editText.setText("");
+
 
     }
 
     /**
-     * Called when loading a conversation for the first time.
+     * Called when loading a conversation.
      */
     public void loadChatListFromDB(){
         //TODO: implement - load messages from DB into ArrayList.
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        chatMessageList = dbHelper.returnAllMessages();
+
     }
 
 }
