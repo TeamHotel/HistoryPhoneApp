@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 
@@ -86,11 +88,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public void addMessage(ChatMessage chatMessage, Artifact artifact){
+    public void addMessage(ChatMessage chatMessage, String artifact_name){
         SQLiteDatabase db = this.getWritableDatabase();
 
         //get id of artifact that we want to add messages for
-        String get_id_query = "SELECT artifact_id FROM artifacts WHERE title="+artifact.getName();
+        String get_id_query = "SELECT artifact_id FROM artifacts WHERE title="+artifact_name;
         final Cursor cursor = db.rawQuery(get_id_query, null);
         int id =0;
         if (cursor != null) {
@@ -103,7 +105,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             }
         }
 
-
         ContentValues values = new ContentValues();
         values.put("artifact_id", id );
         values.put("message_text", chatMessage.getMessage_text());
@@ -112,6 +113,37 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // insert row
         db.insert(TABLE_MESSAGES, null , values);
         db.close();
+    }
+
+    public List<ChatMessage> returnAllMessages(){
+        List<ChatMessage> messageList = new ArrayList<ChatMessage>();
+
+        String selectQuery = "SELECT * FROM messages";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                ChatMessage newMessage = new ChatMessage();
+                newMessage.setMessage_id(Integer.parseInt(cursor.getString(0)));
+                newMessage.setMessage_text(cursor.getString(2));
+                if(Integer.parseInt(cursor.getString(3)) == 0) {
+                    newMessage.setFrom_user(false);
+                }else{
+                    newMessage.setFrom_user(true);
+                }
+                newMessage.setTimestamp(cursor.getString(4));
+
+
+                // Adding contact to list
+                messageList.add(newMessage);
+
+            } while (cursor.moveToNext());
+        }
+
+        return messageList;
     }
 
     //method for converting bitmap to byte array for storing in db
