@@ -4,39 +4,48 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
-import io.reactivex.observers.TestObserver;
 import uk.ac.cam.teamhotel.historyphone.ble.Beacon;
 import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
 
 public class BeaconScannerTest {
 
+    private static boolean scansEqual(ArrayList<Beacon> left,
+                                      ArrayList<Beacon> right) {
+        for (int i = 0; i < left.size(); i++) {
+            if (!left.get(i).equals(right.get(i)))
+                return false;
+        }
+        return true;
+    }
+
     @Test
     public void testBeaconStream() throws Exception {
-        // TODO: redesign as repeatable test
-        //       (create dummy poller which emits predetermined beacons).
+        // TODO: Redesign as repeatable test (create dummy poller which emits set beacons).
+        final ArrayList<Beacon> testPairs = new ArrayList<>();
+        testPairs.add(new Beacon(0L,   34.0f));
+        testPairs.add(new Beacon(453L, 43.0f));
+        testPairs.add(new Beacon(23L,  10.0f));
+
         BeaconScanner scanner = BeaconScanner.getInstance();
-        TestObserver<Beacon[]> observer = new TestObserver<Beacon[]>() {
-            @Override
-            public void onNext(Beacon[] beacons) {
-                Assert.assertTrue(Arrays.deepEquals(beacons, new Beacon[] { null, null, null }));
-                super.onNext(beacons);
-            }
-        };
 
-        scanner.subscribe(observer);
-        observer.assertSubscribed();
+        // Count as an array to work-around final restriction on closures.
+        final int[] count = { 0 };
+        scanner.getBeaconStream().subscribe(pairs -> {
+            Assert.assertTrue(scansEqual(pairs, testPairs));
+            count[0]++;
+        });
 
-        // Test { null, null, null } is emitted repeatedly.
+        // Test { (0, 34), (453, 43), (23, 10) } is emitted repeatedly.
         scanner.start();
         Thread.sleep(2500);
-        Assert.assertTrue(observer.valueCount() >= 2);
+        Assert.assertTrue(count[0] == 2);
 
-        // Test nothing is emitted after polling stops.
+        // Test that scanning stops correctly.
         scanner.stop();
-        int count = observer.valueCount();
+        int before = count[0];
         Thread.sleep(1500);
-        observer.assertValueCount(count);
+        Assert.assertEquals(count[0], before);
     }
 }

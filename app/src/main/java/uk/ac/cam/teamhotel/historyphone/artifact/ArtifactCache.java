@@ -4,6 +4,8 @@ import android.util.LongSparseArray;
 
 /**
  * Simple cache of artifact objects, indexed by beacon UUID.
+ *
+ * TODO: Make thread safe.
  */
 public class ArtifactCache {
 

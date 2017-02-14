@@ -14,15 +14,7 @@ public class Artifact {
         this.picture = picture;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Bitmap getPicture() {
-        return picture;
-    }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public Bitmap getPicture() { return picture; }
 }

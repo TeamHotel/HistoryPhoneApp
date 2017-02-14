@@ -1,44 +1,53 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
+import java.util.ArrayList;
+
 import io.reactivex.Observable;
-import io.reactivex.functions.Function;
 
 public class ArtifactLoader {
 
-    private Observable<Artifact[]> artifactStream;
+    private ArtifactCache artifactCache;
 
     /**
-     * Initialise stream to track incoming UUID arrays and convert them to artifact
+     * Initialise the internal artifact cache.
+     */
+    public ArtifactLoader(/* TODO: Pass db connection. */) {
+        artifactCache = new ArtifactCache();
+    }
+
+    /**
+     * Load a single Artifact object from the cache. If the Artifact is not present
+     * in the cache, it is loaded from the database. If the Artifact is not present
+     * in the database, null is returned and a request made to the server.
+     * @param uuid UUID of the Artifact object.
+     * @return a reference to the loaded artifact object, or null if not found.
+     */
+    public Artifact load(Long uuid) {
+        Artifact artifact = artifactCache.get(uuid);
+        // If the artifact has not been cached, attempt to load it from the db.
+        if (artifact == null) {
+            // TODO: Request artifact from database.
+        }
+        // TODO: If not in database, request from server and return null.
+        return artifact;
+    }
+
+    /**
+     * Return a stream to track incoming UUID arrays and convert them to Artifact
      * arrays, making use of a cache (the same UUID will always return the same,
      * immutable artifact object).
      *
      * @param uuidStream Rx observable stream of UUID arrays.
-     * @param artifactCache Cache of previously retrieved artifact objects.
      */
-    public ArtifactLoader(Observable<Long[]> uuidStream, final ArtifactCache artifactCache
-                          /* TODO: Pass db service provider. */) {
-        artifactStream = uuidStream
-                .map(new Function<Long[], Artifact[]>() {
-                    @Override
-                    public Artifact[] apply(Long[] uuids) throws Exception {
-                        // Map a list of beacon UUIDs to a corresponding list of artifacts.
-                        Artifact[] artifacts = new Artifact[uuids.length];
-                        for (int i = 0; i < uuids.length; i++) {
-                            artifacts[i] = artifactCache.get(uuids[i]);
-                            // If the artifact has not been cached, attempt to load it from the db.
-                            if (artifacts[i] == null) {
-                                // TODO: Request artifact from database.
-                            }
-                        }
-                        return artifacts;
+    public Observable<ArrayList<Artifact>> loadScanStream(Observable<ArrayList<Long>> uuidStream) {
+        return uuidStream
+                .map(uuids -> {
+                    // Map a list of beacon UUIDs to a corresponding list of artifacts.
+                    ArrayList<Artifact> artifacts = new ArrayList<>(uuids.size());
+                    for (int i = 0; i < uuids.size(); i++) {
+                        artifacts.set(i, load(uuids.get(i)));
                     }
+                    return artifacts;
                 });
-    }
-
-    /**
-     * Get the resultant artifact array stream.
-     */
-    public Observable<Artifact[]> getArtifactStream() {
-        return artifactStream;
     }
 }
