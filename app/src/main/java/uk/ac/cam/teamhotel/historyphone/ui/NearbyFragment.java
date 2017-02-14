@@ -96,18 +96,15 @@ public class NearbyFragment extends Fragment {
         // Populate the list view with objects.
         final ListView listView = (ListView) view.findViewById(R.id.nearby_list);
         listView.setAdapter(new ArtifactAdapter(getActivity(), artifacts));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
+        listView.setOnItemClickListener((parent, rowView, position, id) -> {
+            Intent intent = new Intent(getActivity(), ChatActivity.class);
 
-                //pass artifact name to chat session
-                Artifact currentArtifact = (Artifact) listView.getAdapter().getItem(position);
-                intent.putExtra("ARTIFACT_TITLE", currentArtifact.getName());
-                // TODO: Bundle item id with intent to multiplex chats.
+            //pass artifact name to chat session
+            Artifact currentArtifact = (Artifact) listView.getAdapter().getItem(position);
+            intent.putExtra("ARTIFACT_TITLE", currentArtifact.getName());
+            // TODO: Bundle UUID with intent to multiplex chats.
 
-                startActivity(intent);
-            }
+            startActivity(intent);
         });
 
         isCreated = true;
