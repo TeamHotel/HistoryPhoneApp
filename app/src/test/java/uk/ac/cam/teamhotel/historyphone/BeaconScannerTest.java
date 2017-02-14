@@ -32,8 +32,8 @@ public class BeaconScannerTest {
 
         // Count as an array to work-around final restriction on closures.
         final int[] count = { 0 };
-        scanner.getBeaconStream().subscribe(pairs -> {
-            Assert.assertTrue(scansEqual(pairs, testPairs));
+        scanner.getBeaconStream().subscribe(beacons -> {
+            Assert.assertTrue(scansEqual(beacons, testPairs));
             count[0]++;
         });
 

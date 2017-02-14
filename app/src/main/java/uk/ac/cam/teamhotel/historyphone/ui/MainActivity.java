@@ -1,6 +1,5 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -8,13 +7,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import uk.ac.cam.teamhotel.historyphone.R;
-import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
+import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    ArtifactLoader artifactLoader;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -26,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.ViewPager);
         tabLayout = (TabLayout) findViewById(R.id.TabLayout);
+
+        // Create the artifact loader.
+        artifactLoader = new ArtifactLoader();
 
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
@@ -46,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(tab.getPosition());
             }
         });
+
+        Log.i(TAG, "Activity created.");
     }
 
     /**
@@ -62,8 +69,11 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch(position) {
                 case 0:
-                    return new NearbyFragment();
+                    NearbyFragment nearby = new NearbyFragment();
+                    nearby.setArtifactLoader(artifactLoader);
+                    return nearby;
                 case 1:
+                    // TODO: Pass artifact loader.
                     return new RecentFragment();
                 default:
                     return null;
@@ -71,13 +81,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public int getCount() {
-            return titles.length;
-        }
+        public int getCount() { return titles.length; }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            return titles[position];
-        }
+        public CharSequence getPageTitle(int position) { return titles[position]; }
     }
 }

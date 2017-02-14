@@ -6,4 +6,7 @@ public class Beacon extends Pair<Long, Float> {
     public Beacon(Long uuid, Float distance) {
         super(uuid, distance);
     }
+
+    public Long getUUID() { return first; }
+    public Float getDistance() { return second; }
 }

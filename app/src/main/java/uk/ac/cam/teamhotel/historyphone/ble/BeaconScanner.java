@@ -37,11 +37,11 @@ public class BeaconScanner {
                 })
                 .map(tick -> {
                     // TODO: Poll via the beacons library, once we know which we're using.
-                    ArrayList<Beacon> tuples = new ArrayList<>();
-                    tuples.add(new Beacon(0L,   34.0f));
-                    tuples.add(new Beacon(453L, 43.0f));
-                    tuples.add(new Beacon(23L,  10.0f));
-                    return tuples;
+                    ArrayList<Beacon> beacons = new ArrayList<>();
+                    beacons.add(new Beacon(0L,   34.0f));
+                    beacons.add(new Beacon(453L, 43.0f));
+                    beacons.add(new Beacon(23L,  10.0f));
+                    return beacons;
                 });
     }
 
@@ -54,6 +54,11 @@ public class BeaconScanner {
      * Cease scanning for beacons at the next tick.
      */
     public void stop() { scanning.set(false); }
+
+    /**
+     * @return whether the scanner is currently scanning for beacons.
+     */
+    public boolean isScanning() { return scanning.get(); }
 
     /**
      * @return a reference to the beacon stream for observation purposes.

@@ -26,7 +26,7 @@ public class ArtifactLoader {
         Artifact artifact = artifactCache.get(uuid);
         // If the artifact has not been cached, attempt to load it from the db.
         if (artifact == null) {
-            // TODO: Request artifact from database.
+            // TODO: Request artifact from local database.
         }
         // TODO: If not in database, request from server and return null.
         return artifact;
@@ -37,15 +37,15 @@ public class ArtifactLoader {
      * arrays, making use of a cache (the same UUID will always return the same,
      * immutable artifact object).
      *
-     * @param uuidStream Rx observable stream of UUID arrays.
+     * @param uuidsStream Rx observable stream of UUID arrays.
      */
-    public Observable<ArrayList<Artifact>> loadScanStream(Observable<ArrayList<Long>> uuidStream) {
-        return uuidStream
+    public Observable<ArrayList<Artifact>> loadScanStream(Observable<ArrayList<Long>> uuidsStream) {
+        return uuidsStream
                 .map(uuids -> {
                     // Map a list of beacon UUIDs to a corresponding list of artifacts.
-                    ArrayList<Artifact> artifacts = new ArrayList<>(uuids.size());
+                    ArrayList<Artifact> artifacts = new ArrayList<>();
                     for (int i = 0; i < uuids.size(); i++) {
-                        artifacts.set(i, load(uuids.get(i)));
+                        artifacts.add(load(uuids.get(i)));
                     }
                     return artifacts;
                 });
