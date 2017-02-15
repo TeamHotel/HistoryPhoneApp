@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.util.Log;
@@ -22,6 +23,7 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.ble.Beacon;
 import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
+import uk.ac.cam.teamhotel.historyphone.server.MetaQuery;
 import uk.ac.cam.teamhotel.historyphone.utils.StreamTools;
 
 // TODO: Add database integration (Harry is currently looking into this).
@@ -90,8 +92,15 @@ public class NearbyFragment extends Fragment {
 
         // Just for aesthetic example, for now.
         artifacts.clear();
-        artifacts.add(new Artifact("Harry", "Chat to Harry", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
-        artifacts.add(new Artifact("Sam", "Chat to Sam", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
+        artifacts.add(new Artifact("Harry", "Chat to Harry", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), 123L));
+        artifacts.add(new Artifact("Sam", "Chat to Sam", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), 123L));
+        try {
+            //Demonstrate using Asynctask to download artifact and add to listview
+            Artifact art = new DownloadAsyncTask().execute(123L).get();
+            artifacts.add(art);
+        } catch (Exception e) {
+            //e.g if you're not running a server
+        }
 
         // Populate the list view with objects.
         final ListView listView = (ListView) view.findViewById(R.id.nearby_list);
@@ -102,7 +111,7 @@ public class NearbyFragment extends Fragment {
             //pass artifact name to chat session
             Artifact currentArtifact = (Artifact) listView.getAdapter().getItem(position);
             intent.putExtra("ARTIFACT_TITLE", currentArtifact.getName());
-            // TODO: Bundle UUID with intent to multiplex chats.
+            intent.putExtra("UUID", currentArtifact.getUUID());
 
             startActivity(intent);
         });
@@ -110,5 +119,19 @@ public class NearbyFragment extends Fragment {
         isCreated = true;
 
         return view;
+    }
+
+    private class DownloadAsyncTask extends AsyncTask<Long, Void, Artifact> {
+
+        @Override
+        protected Artifact doInBackground(Long... params) {
+            //invoke static method to download artifact with uuid 123.
+            return MetaQuery.getArtifact(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Artifact artifact) {
+            super.onPostExecute(artifact);
+        }
     }
 }

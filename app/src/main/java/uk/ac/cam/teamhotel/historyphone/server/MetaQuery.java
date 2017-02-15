@@ -76,7 +76,7 @@ public class MetaQuery {
             Bitmap image = getImage(uuid);
 
             //create new artifact
-            result = new Artifact(name, description, image);
+            result = new Artifact(name, description, image, uuid);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException j) {
