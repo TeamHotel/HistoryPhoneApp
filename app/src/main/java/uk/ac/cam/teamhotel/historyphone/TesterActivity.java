@@ -1,15 +1,11 @@
 package uk.ac.cam.teamhotel.historyphone;
 
-import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.concurrent.ExecutionException;
 

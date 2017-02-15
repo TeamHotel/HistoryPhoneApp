@@ -20,7 +20,11 @@ import org.json.JSONObject;
 
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 
-
+/**
+ * This class has the ability to request images and metadata from the server based on the object uuid
+ * getImage() returns the correct bitmap
+ * getArtifact() actually builds and returns an artifact object
+ */
 public class MetaQuery {
     private static final String TAG = "MetaQuery";
 
