@@ -8,7 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
- * Message Sender provides a class to send messages to a server and receive the reply
+ * MessageSender provides a class to send messages to a server and receive the reply
  */
 
 public class MessageSender {

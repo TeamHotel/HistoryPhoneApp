@@ -3,6 +3,7 @@ package uk.ac.cam.teamhotel.historyphone.artifact;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
+import uk.ac.cam.teamhotel.historyphone.server.MetaQuery;
 
 public class ArtifactLoader {
 
@@ -28,7 +29,8 @@ public class ArtifactLoader {
         if (artifact == null) {
             // TODO: Request artifact from local database.
         }
-        // TODO: If not in database, request from server and return null.
+        //retrieve artifact from server (may need AsyncTask)
+        artifact = MetaQuery.getArtifact(uuid);
         return artifact;
     }
 
