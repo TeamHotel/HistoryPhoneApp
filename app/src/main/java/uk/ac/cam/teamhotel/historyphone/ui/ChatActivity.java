@@ -1,6 +1,7 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -113,7 +114,7 @@ public class ChatActivity extends AppCompatActivity {
                 //update list of items displayed
                 adapter.notifyDataSetChanged();
             } else { //no response received - i.e. no connection to server or error with response
-                //TODO: Deal with the error here
+                Snackbar.make(findViewById(R.id.chat_list), "Your message was NOT sent", Snackbar.LENGTH_LONG).show();
             }
             super.onPostExecute(reply);
         }

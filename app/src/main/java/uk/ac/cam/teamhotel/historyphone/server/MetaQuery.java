@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 
 import android.graphics.Bitmap;
@@ -79,14 +80,19 @@ public class MetaQuery {
             result = new Artifact(name, description, image, uuid);
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         } catch (JSONException j) {
             j.printStackTrace();
+            return null;
         }
         return result;
     }
 
     public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        InputStream is = new URL(url).openStream();
+        URLConnection connection = new URL(url).openConnection();
+        //set timeout so the app doesn't stall
+        connection.setConnectTimeout(500);
+        InputStream is = connection.getInputStream();
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 

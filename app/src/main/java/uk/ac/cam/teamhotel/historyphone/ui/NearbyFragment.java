@@ -97,7 +97,9 @@ public class NearbyFragment extends Fragment {
         try {
             //Demonstrate using Asynctask to download artifact and add to listview
             Artifact art = new DownloadAsyncTask().execute(123L).get();
-            artifacts.add(art);
+            if (art != null) {
+                artifacts.add(art);
+            }
         } catch (Exception e) {
             //e.g if you're not running a server
         }
