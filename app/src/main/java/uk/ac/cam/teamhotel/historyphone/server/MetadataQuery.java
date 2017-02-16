@@ -25,9 +25,12 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
  * This class has the ability to request images and metadata from the
  * server based on the artifact UUID.
  */
-public class MetaQuery {
+public class MetadataQuery {
 
-    private static final String TAG = "MetaQuery";
+    private static final String TAG = "MetadataQuery";
+    private static final String INFO_URL = "http://10.0.2.2:12345/api/info?id=";
+    private static final String IMG_URL = "http://10.0.2.2:12345/img/";
+    private static final String IMG_EXT = ".png";
 
     /**
      * Get the bitmap associated with a particular artifact from the server.
@@ -37,13 +40,13 @@ public class MetaQuery {
      */
     public static Bitmap getImage(long uuid) {
         Bitmap result = null;
-        Log.d(TAG, "getImage: Try to get image!");
+        Log.d(TAG, "Requesting image for artifact '" + String.valueOf(uuid) + "'...");
         try {
             // Create url string.
-            String urlString = "http://10.0.2.2:12345/img/" + String.valueOf(uuid) + ".png";
+            String urlString = IMG_URL + String.valueOf(uuid) + IMG_EXT;
 
             // Open the connection connection.
-            URL url = new URL(urlString);  // TODO: Insert the appropriate server url.
+            URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
 
@@ -59,7 +62,7 @@ public class MetaQuery {
 
             // Use the byte output stream to create a bitmap.
             result = BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
-            Log.d(TAG, "getImage: Got the image!");
+            Log.d(TAG, "Retrieved image for artifact '" + String.valueOf(uuid) + "' successfully.");
         } catch (MalformedURLException e) {
             System.err.print("There was a problem with generating the URL.");
             e.printStackTrace();
@@ -71,16 +74,17 @@ public class MetaQuery {
     }
 
     /**
-     * Request artifact metadata from the server and use
-     * it to build an artifact object.
+     * Request artifact metadata from the server and use it to build an artifact
+     * object. In the event of an error, null is returned.
      *
      * @param uuid UUID of the requested artifact.
      * @return the newly built artifact object.
      */
     public static Artifact getArtifact(long uuid) {
+        Log.d(TAG, "Querying server for artifact '" + String.valueOf(uuid) + "'...");
         Artifact result = null;
         // TODO: Change URL for when the server is not running on localhost.
-        String url = "http://10.0.2.2:12345/api/info?id=" + String.valueOf(uuid);
+        String url = INFO_URL + String.valueOf(uuid);
         try {
             // Read JSON from server.
             JSONObject jsonObject = readJsonFromUrl(url);
@@ -92,6 +96,7 @@ public class MetaQuery {
 
             // Create new artifact.
             result = new Artifact(name, description, image, uuid);
+            Log.d(TAG, "Retrieved metadata for '" + String.valueOf(uuid) + "' successfully.");
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }

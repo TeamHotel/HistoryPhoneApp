@@ -23,7 +23,7 @@ public class MessageSender {
             urlString += "&uuid=" + String.valueOf(uuid);
 
             //Get response from server
-            JSONObject jsonObject = MetaQuery.readJsonFromUrl(urlString);
+            JSONObject jsonObject = MetadataQuery.readJsonFromUrl(urlString);
 
             //extract and return data from JSON
             return jsonObject.getString("message");

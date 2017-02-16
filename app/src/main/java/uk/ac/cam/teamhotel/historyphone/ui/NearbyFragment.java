@@ -21,7 +21,7 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.ble.Beacon;
 import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
-import uk.ac.cam.teamhotel.historyphone.server.MetaQuery;
+import uk.ac.cam.teamhotel.historyphone.server.MetadataQuery;
 import uk.ac.cam.teamhotel.historyphone.utils.ListTools;
 
 // TODO: Add database integration (Harry is currently looking into this).
@@ -126,7 +126,7 @@ public class NearbyFragment extends Fragment {
         @Override
         protected Artifact doInBackground(Long... params) {
             // Invoke static method to download artifact with uuid 123.
-            return MetaQuery.getArtifact(params[0]);
+            return MetadataQuery.getArtifact(params[0]);
         }
 
         @Override

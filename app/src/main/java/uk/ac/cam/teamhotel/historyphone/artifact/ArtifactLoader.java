@@ -1,9 +1,11 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
+import android.os.AsyncTask;
+
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
-import uk.ac.cam.teamhotel.historyphone.server.MetaQuery;
+import uk.ac.cam.teamhotel.historyphone.server.MetadataQuery;
 
 public class ArtifactLoader {
 
@@ -46,8 +48,7 @@ public class ArtifactLoader {
      * @param uuid UUID of the requested artifact.
      */
     public void retrieve(Long uuid) {
-        // TODO: Implement AsyncTask.
-        artifactCache.set(uuid, MetaQuery.getArtifact(uuid));
+        new ArtifactRetrievalTask().execute(uuid);
     }
 
     /**
@@ -67,5 +68,25 @@ public class ArtifactLoader {
                     }
                     return artifacts;
                 });
+    }
+
+    private class ArtifactRetrievalTask extends AsyncTask<Long, Void, Artifact> {
+
+        private long uuid;
+
+        @Override
+        protected Artifact doInBackground(Long... params) {
+            // Invoke static method to download artifact with uuid 123.
+            uuid = params[0];
+            return MetadataQuery.getArtifact(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Artifact artifact) {
+            // Store the newly retrieved artifact in the cache.
+            artifactCache.set(uuid, artifact);
+
+            super.onPostExecute(artifact);
+        }
     }
 }
