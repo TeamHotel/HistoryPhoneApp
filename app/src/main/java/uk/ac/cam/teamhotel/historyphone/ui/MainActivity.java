@@ -93,23 +93,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.test_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.image_test:
-                Intent intent = new Intent(this, TesterActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                break;
-        }
-        return true;
-    }
+//    The following code is used to access test interface for server communication
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.test_menu, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch(item.getItemId()) {
+//            case R.id.image_test:
+//                Intent intent = new Intent(this, TesterActivity.class);
+//                startActivity(intent);
+//                break;
+//            default:
+//                break;
+//        }
+//        return true;
+//    }
 }

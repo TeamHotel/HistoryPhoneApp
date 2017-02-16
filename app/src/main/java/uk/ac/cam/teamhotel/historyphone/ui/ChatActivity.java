@@ -1,6 +1,7 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,11 +14,14 @@ import java.util.List;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
+import uk.ac.cam.teamhotel.historyphone.server.MessageContainer;
 import uk.ac.cam.teamhotel.historyphone.server.MessageSender;
+import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 
 public class ChatActivity extends AppCompatActivity {
 
     private static String ARTIFACT_NAME = "null";
+    private static long uuid;
     private DatabaseHelper dbHelper;
     private ChatAdapter adapter;
 
@@ -29,6 +33,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //get artifact name passed from previous fragment view
         ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
+        uuid = getIntent().getLongExtra("UUID", 123L);
 
         //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
         dbHelper = new DatabaseHelper(this);
@@ -66,6 +71,7 @@ public class ChatActivity extends AppCompatActivity {
         ChatMessage newMessage = new ChatMessage();
         newMessage.setMessage_text(message);
         newMessage.setFrom_user(true);
+        newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
 
         //dbHelper.addMessage(newMessage, ARTIFACT_NAME );
         chatMessageList.add(newMessage);
@@ -73,7 +79,7 @@ public class ChatActivity extends AppCompatActivity {
         editText.setText("");
 
         //Send message to server and receive reply.
-        new MessageAsyncTask().execute(message);
+        new MessageAsyncTask().execute(new MessageContainer(message, uuid));
     }
 
     /**
@@ -85,12 +91,14 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    private class MessageAsyncTask extends AsyncTask<String, Void, String> {
+    private class MessageAsyncTask extends AsyncTask<MessageContainer, Void, String> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected String doInBackground(MessageContainer... params) {
             //invoke static method to download artifact with uuid 123.
-            return MessageSender.sendMessage(params[0]);
+            String message = params[0].getMessage();
+            long uuid = params[0].getUuid();
+            return MessageSender.sendMessage(message, uuid);
         }
 
         @Override
@@ -99,13 +107,14 @@ public class ChatActivity extends AppCompatActivity {
                 ChatMessage newMessage = new ChatMessage();
                 newMessage.setMessage_text(reply);
                 newMessage.setFrom_user(false);
+                newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
 
                 //dbHelper.addMessage(newMessage, ARTIFACT_NAME );
                 chatMessageList.add(newMessage);
                 //update list of items displayed
                 adapter.notifyDataSetChanged();
             } else { //no response received - i.e. no connection to server or error with response
-                //TODO: Deal with the error here
+                Snackbar.make(findViewById(R.id.chat_list), "Your message was NOT sent", Snackbar.LENGTH_LONG).show();
             }
             super.onPostExecute(reply);
         }

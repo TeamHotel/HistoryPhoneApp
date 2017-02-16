@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 
 import android.graphics.Bitmap;
@@ -81,16 +82,16 @@ public class MetaQuery {
         // TODO: Change URL for when the server is not running on localhost.
         String url = "http://10.0.2.2:12345/api/info?id=" + String.valueOf(uuid);
         try {
-            //read JSON from server
+            // Read JSON from server.
             JSONObject jsonObject = readJsonFromUrl(url);
 
-            //extract data from JSON
+            // Extract data from JSON.
             String name = jsonObject.getString("name");
             String description = jsonObject.getString("description");
             Bitmap image = getImage(uuid);
 
-            //create new artifact
-            result = new Artifact(name, description, image);
+            // Create new artifact.
+            result = new Artifact(name, description, image, uuid);
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
@@ -104,9 +105,11 @@ public class MetaQuery {
      * @return the newly built JSON object.
      */
     public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        try (InputStream is = new URL(url).openStream()) {
-            BufferedReader rd = new BufferedReader(
-                    new InputStreamReader(is, Charset.forName("UTF-8")));
+        URLConnection connection = new URL(url).openConnection();
+        // Set timeout so the app doesn't stall.
+        connection.setConnectTimeout(500);
+        try (InputStream is = connection.getInputStream()) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 
             // Build JSON string from input stream.
             StringBuilder sb = new StringBuilder();
