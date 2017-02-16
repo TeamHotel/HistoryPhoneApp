@@ -1,6 +1,5 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,11 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.R;
-import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 import uk.ac.cam.teamhotel.historyphone.server.MessageSender;
-import uk.ac.cam.teamhotel.historyphone.server.MetaQuery;
 
 public class ChatActivity extends AppCompatActivity {
 

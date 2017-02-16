@@ -8,11 +8,9 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 
@@ -22,7 +20,7 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.ble.Beacon;
 import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
-import uk.ac.cam.teamhotel.historyphone.utils.StreamTools;
+import uk.ac.cam.teamhotel.historyphone.utils.ListTools;
 
 // TODO: Add database integration (Harry is currently looking into this).
 // TODO: Add methods for interacting with bluetooth beacons and pulling the Artifact meta-data dynamically.
@@ -47,22 +45,20 @@ public class NearbyFragment extends Fragment {
                             (left, right) -> left.getDistance().compareTo(right.getDistance()));
                     return beacons;
                 });
-        // Unzip the beacon scans into two separate arrays and project them into separate streams.
+        // Unzip the beacon scans into two separate arrays.
         Observable<Pair<ArrayList<Long>, ArrayList<Float>>> listsStream =
-                StreamTools.unzipPairs(sortedStream);
-        Observable<ArrayList<Long>> uuidsStream =
-                StreamTools.projLeft(listsStream);
-        Observable<ArrayList<Float>> distancesStream =
-                StreamTools.projRight(listsStream);
+                sortedStream.map(ListTools::unzipPairs);
         // Load artifacts from the UUIDs stream.
-        Observable<ArrayList<Artifact>> artifactStream =
-                artifactLoader.loadScanStream(uuidsStream);
+        Observable<ArrayList<Artifact>> artifactsStream =
+                artifactLoader.loadScanStream(listsStream.map(ListTools::projLeft));
+        Observable<ArrayList<Float>> distancesStream =
+                listsStream.map(ListTools::projRight);
         // Zip the artifact and distances streams back together.
-        entriesStream = StreamTools.zipPairs(artifactStream, distancesStream);
+        entriesStream = Observable.zip(artifactsStream, distancesStream, ListTools::zipPairs);
 
         if (!scanner.isScanning() /* TODO: && Bluetooth is enabled. */) {
             scanner.start();
-        } // TODO: else prompt for Bluetooth.
+        }  // TODO: else prompt for Bluetooth.
     }
 
     public void setArtifactLoader(ArtifactLoader artifactLoader) {
