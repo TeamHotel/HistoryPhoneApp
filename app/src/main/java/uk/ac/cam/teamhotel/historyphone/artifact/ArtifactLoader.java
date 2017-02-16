@@ -20,18 +20,34 @@ public class ArtifactLoader {
      * Load a single Artifact object from the cache. If the Artifact is not present
      * in the cache, it is loaded from the database. If the Artifact is not present
      * in the database, null is returned and a request made to the server.
-     * @param uuid UUID of the Artifact object.
+     *
+     * @param uuid UUID of the requested Artifact object.
      * @return a reference to the loaded artifact object, or null if not found.
      */
     public Artifact load(Long uuid) {
         Artifact artifact = artifactCache.get(uuid);
-        // If the artifact has not been cached, attempt to load it from the db.
+        // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
             // TODO: Request artifact from local database.
         }
-        //retrieve artifact from server (may need AsyncTask)
-        artifact = MetaQuery.getArtifact(uuid);
+        // If the artifact metadata is not present in the db, concurrently retrieve it
+        // from the server and return null.
+        if (artifact == null) {
+            retrieve(uuid);
+        }
         return artifact;
+    }
+
+    /**
+     * Download metadata for an artifact from the server, creating and caching an
+     * object for it and storing the metadata in the artifacts table. The request
+     * is performed using an AsyncTask, so operates concurrently with the UI thread.
+     *
+     * @param uuid UUID of the requested artifact.
+     */
+    public void retrieve(Long uuid) {
+        // TODO: Implement AsyncTask.
+        artifactCache.set(uuid, MetaQuery.getArtifact(uuid));
     }
 
     /**
