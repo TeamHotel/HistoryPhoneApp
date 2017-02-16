@@ -58,9 +58,11 @@ public class NearbyFragment extends Fragment {
         // Zip the artifact and distances streams back together.
         entriesStream = Observable.zip(artifactsStream, distancesStream, ListTools::zipPairs);
 
-        if (!scanner.isScanning() /* TODO: && Bluetooth is enabled. */) {
+        if (!scanner.isScanning()) {
+            // TODO: If Bluetooth is enabled...
             scanner.start();
-        }  // TODO: else prompt for Bluetooth.
+            // TODO: ...else prompt for Bluetooth.
+        }
     }
 
     public void setArtifactLoader(ArtifactLoader artifactLoader) {
