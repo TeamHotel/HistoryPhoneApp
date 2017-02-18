@@ -1,8 +1,10 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 public class Artifact {
+    private static final String TAG = "Artifact";
 
     private long uuid;
     private String name;
@@ -11,6 +13,7 @@ public class Artifact {
 
     public Artifact(long uuid, String name, String description, Bitmap picture) {
         this.uuid = uuid;
+        Log.d(TAG, "Artifact: Created artifact with uuid :" + uuid);
         this.name = name;
         this.description = description;
         this.picture = picture;

@@ -41,7 +41,7 @@ public class BeaconScanner {
         // Dummy scan for beacons.
         ArrayList<Beacon> beacons = new ArrayList<>();
         beacons.add(new Beacon(0L,   0.0f));
-        beacons.add(new Beacon(453L, 1.0f));
+        beacons.add(new Beacon(123L, 1.0f));
         for (int i = 0; i < new Random().nextInt(7); i++) {
             beacons.add(new Beacon(23L, 2.0f + i));
         }
