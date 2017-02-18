@@ -62,13 +62,11 @@ public class MetadataQuery {
 
             // Use the byte output stream to create a bitmap.
             result = BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
-            Log.d(TAG, "Retrieved image for artifact '" + String.valueOf(uuid) + "' successfully.");
-        } catch (MalformedURLException e) {
-            System.err.print("There was a problem with generating the URL.");
-            e.printStackTrace();
+            Log.d(TAG, "Retrieved image for artifact '" +
+                    String.valueOf(uuid) + "' successfully.");
         } catch (IOException e) {
-            System.err.print("There has been an I/O error.");
-            e.printStackTrace();
+            Log.e(TAG, "I/O error retrieving image for artifact '" +
+                    String.valueOf(uuid) + "': " + e.getMessage());
         }
         return result;
     }
@@ -95,10 +93,11 @@ public class MetadataQuery {
             Bitmap image = getImage(uuid);
 
             // Create new artifact.
-            result = new Artifact(name, description, image, uuid);
+            result = new Artifact(uuid, name, description, image);
             Log.d(TAG, "Retrieved metadata for '" + String.valueOf(uuid) + "' successfully.");
         } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, "I/O error retrieving metadata for artifact '" +
+                    String.valueOf(uuid) + "': " + e.getMessage());
         }
         return result;
     }
