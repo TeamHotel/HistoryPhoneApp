@@ -41,18 +41,15 @@ public class ChatActivity extends AppCompatActivity {
         loadChatListFromDB();
 
         chatMessageList.clear();
-        ChatMessage exampleMessage = new ChatMessage();
-        exampleMessage.setFrom_user(false);
-        exampleMessage.setMessage_text("Hello, world.");
-        exampleMessage.setTimestamp("sent: 11:00am");
 
-        ChatMessage exampleMessage2 = new ChatMessage();
-        exampleMessage2.setFrom_user(true);
-        exampleMessage2.setMessage_text("Hello, from a user.");
-        exampleMessage2.setTimestamp("sent: 11:01am");
-
-        chatMessageList.add(exampleMessage);
-        chatMessageList.add(exampleMessage2);
+        //send 'init' message and server will reply with object greeting
+        new MessageAsyncTask().execute(new MessageContainer("init", uuid));
+//        ChatMessage exampleMessage2 = new ChatMessage();
+//        exampleMessage2.setFrom_user(true);
+//        exampleMessage2.setMessage_text("Hello, from a user.");
+//        exampleMessage2.setTimestamp("sent: 11:01am");
+//
+//        chatMessageList.add(exampleMessage2);
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(getApplicationContext(),chatMessageList );
@@ -91,6 +88,8 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+
+    //this is used to send messages and receive responses - it assumes that messages have already been saved.
     private class MessageAsyncTask extends AsyncTask<MessageContainer, Void, String> {
 
         @Override
@@ -114,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
                 //update list of items displayed
                 adapter.notifyDataSetChanged();
             } else { //no response received - i.e. no connection to server or error with response
-                Snackbar.make(findViewById(R.id.chat_list), "Your message was NOT sent", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.chat_list), "You have lost connection", Snackbar.LENGTH_LONG).show();
             }
             super.onPostExecute(reply);
         }
