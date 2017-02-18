@@ -1,6 +1,7 @@
 package uk.ac.cam.teamhotel.historyphone.utils;
 
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import java.util.ArrayList;
 

@@ -9,4 +9,9 @@ public class Beacon extends Pair<Long, Float> {
 
     public Long getUUID() { return first; }
     public Float getDistance() { return second; }
+
+    @Override
+    public String toString() {
+        return "Beacon(" + String.valueOf(getUUID()) + ", " + String.valueOf(getDistance()) + ")";
+    }
 }
