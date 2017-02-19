@@ -137,7 +137,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         String sqlQuery = "INSERT OR REPLACE INTO conversations (uuid, recent_time) " +
-                "VALUES ("+ chatMessage.getUuid() +", " + chatMessage.getTimestamp() + ");";
+                "VALUES ("+ chatMessage.getUuid() +", '" + chatMessage.getTimestamp() + "');";
         db.execSQL(sqlQuery);
         db.close();
 
