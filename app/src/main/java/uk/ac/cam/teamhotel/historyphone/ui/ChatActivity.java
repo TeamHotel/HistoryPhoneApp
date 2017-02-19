@@ -69,11 +69,19 @@ public class ChatActivity extends AppCompatActivity {
         newMessage.setMessage_text(message);
         newMessage.setFrom_user(true);
         newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
+        newMessage.setUuid(uuid);
 
-        //dbHelper.addMessage(newMessage, ARTIFACT_NAME );
+        //add message to local db messages table
+        dbHelper.addMessage(newMessage, ARTIFACT_NAME );
+
+        //add or update the conversations table with the most recent timestamp for the current Artifact
+        dbHelper.addToOrUpdateConversations(newMessage);
+
         chatMessageList.add(newMessage);
         //reset the text view to empty
         editText.setText("");
+
+
 
         //Send message to server and receive reply.
         new MessageAsyncTask().execute(new MessageContainer(message, uuid));
@@ -83,7 +91,7 @@ public class ChatActivity extends AppCompatActivity {
      * Called when loading a conversation.
      */
     public void loadChatListFromDB(){
-        //TODO: implement - load messages from DB into ArrayList.
+
         chatMessageList = dbHelper.returnAllMessages();
 
     }

@@ -17,9 +17,12 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
+import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactCache;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 
 public class ChatAdapter extends ArrayAdapter<ChatMessage> {
+
+    private ArtifactCache appCache = ArtifactCache.getInstance();
 
     public ChatAdapter(Context context, List<ChatMessage> messages) {
         // resource ID = 0 as custom Adapter already handles this
@@ -55,8 +58,13 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
             // Set parameters of artifact tile.
             message_text.setText(chatMessage.getMessage_text());
             timestamp.setText(chatMessage.getTimestamp());
-            id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
-            //TODO: add way of adding the corresponding Artifact picture, if type==0
+            if(type ==0){
+                id_image.setImageBitmap(appCache.get(chatMessage.getUuid()).getPicture());
+            }else{
+                //user image - ic_launcher for now
+                //TODO: add a different user image maybe
+                id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
+            }
 
         }
 

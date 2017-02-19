@@ -126,6 +126,18 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.close();
     }
 
+    //add record to table if not exists else update record with latest timestamp
+    public void addToOrUpdateConversations(ChatMessage chatMessage){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "INSERT OR REPLACE INTO conversations (uuid, recent_time) " +
+                "VALUES ("+ chatMessage.getUuid() +", " + chatMessage.getTimestamp() + ");";
+        db.execSQL(sqlQuery);
+        db.close();
+
+    }
+
     public List<ChatMessage> returnAllMessages(){
         List<ChatMessage> messageList = new ArrayList<ChatMessage>();
 
