@@ -15,7 +15,7 @@ public class ArtifactLoader {
      * Initialise the internal artifact cache.
      */
     public ArtifactLoader(/* TODO: Pass db connection. */) {
-        artifactCache = new ArtifactCache();
+        artifactCache = ArtifactCache.getInstance();
     }
 
     /**

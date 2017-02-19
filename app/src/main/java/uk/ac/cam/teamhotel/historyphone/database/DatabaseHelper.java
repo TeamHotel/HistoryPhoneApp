@@ -22,7 +22,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     //Table Names
     private static final String TABLE_ARTIFACTS = "artifacts";
     private static final String TABLE_MESSAGES = "messages";
-    //private static final String TABLE_ARTIFACTS_MESSAGES = "artifacts_messages";
+    private static final String TABLE_CONVERSATIONS = "conversations";
+
 
     //Table IDs
     private static final String ARTIFACTS_ID = "artifact_id";
@@ -36,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     // SQL statement to create artifact table
     private static final String CREATE_ARTIFACT_TABLE = "CREATE TABLE IF NOT EXISTS artifacts ( " +
             "artifact_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "uuid INTEGER NOT NULL, " +
             "title TEXT NOT NULL, "+
             "description TEXT NOT NULL, " +
             "image BLOB NOT NULL )";
@@ -49,6 +51,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
              "FOREIGN KEY(artifact_id) REFERENCES artifacts(artifact_id) )";
 
+    // SQL statement to create conversations table
+    private static final String CREATE_CONVERSATIONS_TABLE = "CREATE TABLE IF NOT EXISTS conversations ( " +
+            "uuid INTEGER PRIMARY KEY, " +
+            "recent_time DATETIME )";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 
@@ -58,6 +65,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // create messages table
         db.execSQL(CREATE_MESSAGE_TABLE);
 
+        // create conversations table
+        db.execSQL(CREATE_CONVERSATIONS_TABLE);
+
     }
 
     @Override
@@ -65,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // on upgrade drop older tables
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ARTIFACTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
-       // db.execSQL("DROP TABLE IF EXISTS " + TABLE_ARTIFACTS_MESSAGES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONVERSATIONS);
 
         // create new tables
         onCreate(db);
@@ -78,6 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put("uuid", artifact.getUUID());
         values.put("title", artifact.getName() );
         values.put("description", artifact.getDescription());
         values.put("image", getBitmapAsByteArray(artifact.getPicture()));

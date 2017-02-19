@@ -9,12 +9,24 @@ import android.util.LongSparseArray;
  */
 public class ArtifactCache {
 
+    //singleton instance variable
+    private static ArtifactCache instance = null;
+
     private LongSparseArray<Artifact> cache;
 
-    public ArtifactCache() {
+    //private constructor for singleton implementation
+    private ArtifactCache() {
         cache = new LongSparseArray<>();
         // TODO: Remove once artifact loading from server works.
         cache.put(0L, new Artifact(0L, "Thing", "Some friccin type of thingo", null));
+    }
+
+    //use this method to get a single instance of the class
+    public static ArtifactCache getInstance(){
+        if(instance ==null){
+            instance = new ArtifactCache();
+        }
+        return instance;
     }
 
     public Artifact get(long uuid) {
