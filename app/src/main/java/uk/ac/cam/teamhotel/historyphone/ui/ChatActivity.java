@@ -32,7 +32,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         //get artifact name passed from previous fragment view
-        ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
+        //ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
         uuid = getIntent().getLongExtra("UUID", 123L);
 
         //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
+import android.support.v4.util.Pair;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 
+//TODO: Check workflow of timestamps / datetimes with database and the app
 public class DatabaseHelper extends SQLiteOpenHelper{
 
     // Database Version
@@ -167,6 +169,29 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }
 
         return messageList;
+    }
+
+    public List<Pair<Long, String>> returnAllConversations(){
+
+        List<Pair<Long, String>> entries = new ArrayList<Pair<Long, String>>();
+        String selectQuery = "select *  from Table conversations by datetime(recent_time) DESC ";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                //read from db row
+                Pair<Long, String> newRow = new Pair<>(Long.parseLong(cursor.getString(0)), (cursor.getString(1)));
+
+                //add to list
+                entries.add(newRow);
+
+            } while (cursor.moveToNext());
+        }
+
+        return entries;
     }
 
     //method for converting bitmap to byte array for storing in db
