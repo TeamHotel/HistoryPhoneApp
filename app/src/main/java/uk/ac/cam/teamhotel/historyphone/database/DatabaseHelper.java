@@ -18,9 +18,11 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 public class DatabaseHelper extends SQLiteOpenHelper{
 
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     // Database Name
     private static final String DATABASE_NAME = "HistoryPhoneDB";
+
+
     //Table Names
     private static final String TABLE_ARTIFACTS = "artifacts";
     private static final String TABLE_MESSAGES = "messages";
@@ -34,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
 
     // SQL statement to create artifact table
@@ -174,7 +177,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public List<Pair<Long, String>> returnAllConversations(){
 
         List<Pair<Long, String>> entries = new ArrayList<Pair<Long, String>>();
-        String selectQuery = "select *  from Table conversations by datetime(recent_time) DESC ";
+        String selectQuery = "SELECT *  FROM conversations ORDER by datetime(recent_time) DESC ";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

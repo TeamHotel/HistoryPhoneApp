@@ -25,7 +25,7 @@ import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactCache;
 public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
 
     private List<Pair<Long, String>> artifactList = new ArrayList<Pair<Long, String>>();
-    
+
 
     public RecentAdapter(Context context, List<Pair<Long, String>> objects) {
         super(context, R.layout.list_item, objects);

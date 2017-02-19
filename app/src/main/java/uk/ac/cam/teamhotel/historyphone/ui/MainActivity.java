@@ -11,11 +11,12 @@ import android.util.Log;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
+import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
+    private DatabaseHelper dbhelper = new DatabaseHelper(this);
     ArtifactLoader artifactLoader;
 
     TabLayout tabLayout;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         viewPager = (ViewPager) findViewById(R.id.ViewPager);
         tabLayout = (TabLayout) findViewById(R.id.TabLayout);
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Log.i(TAG, "Activity created.");
+
+
     }
 
     /**
