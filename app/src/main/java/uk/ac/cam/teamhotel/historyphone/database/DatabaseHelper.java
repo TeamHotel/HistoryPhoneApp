@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
+import android.support.v4.util.Pair;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -13,16 +14,20 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 
+//TODO: Check workflow of timestamps / datetimes with database and the app
 public class DatabaseHelper extends SQLiteOpenHelper{
 
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     // Database Name
     private static final String DATABASE_NAME = "HistoryPhoneDB";
+
+
     //Table Names
     private static final String TABLE_ARTIFACTS = "artifacts";
     private static final String TABLE_MESSAGES = "messages";
-    //private static final String TABLE_ARTIFACTS_MESSAGES = "artifacts_messages";
+    private static final String TABLE_CONVERSATIONS = "conversations";
+
 
     //Table IDs
     private static final String ARTIFACTS_ID = "artifact_id";
@@ -31,11 +36,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
 
     // SQL statement to create artifact table
     private static final String CREATE_ARTIFACT_TABLE = "CREATE TABLE IF NOT EXISTS artifacts ( " +
             "artifact_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "uuid INTEGER NOT NULL, " +
             "title TEXT NOT NULL, "+
             "description TEXT NOT NULL, " +
             "image BLOB NOT NULL )";
@@ -49,6 +56,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
              "FOREIGN KEY(artifact_id) REFERENCES artifacts(artifact_id) )";
 
+    // SQL statement to create conversations table
+    private static final String CREATE_CONVERSATIONS_TABLE = "CREATE TABLE IF NOT EXISTS conversations ( " +
+            "uuid INTEGER PRIMARY KEY, " +
+            "recent_time DATETIME )";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 
@@ -58,6 +70,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // create messages table
         db.execSQL(CREATE_MESSAGE_TABLE);
 
+        // create conversations table
+        db.execSQL(CREATE_CONVERSATIONS_TABLE);
+
     }
 
     @Override
@@ -65,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         // on upgrade drop older tables
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ARTIFACTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
-       // db.execSQL("DROP TABLE IF EXISTS " + TABLE_ARTIFACTS_MESSAGES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONVERSATIONS);
 
         // create new tables
         onCreate(db);
@@ -78,6 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put("uuid", artifact.getUUID());
         values.put("title", artifact.getName() );
         values.put("description", artifact.getDescription());
         values.put("image", getBitmapAsByteArray(artifact.getPicture()));
@@ -115,6 +131,18 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.close();
     }
 
+    //add record to table if not exists else update record with latest timestamp
+    public void addToOrUpdateConversations(ChatMessage chatMessage){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "INSERT OR REPLACE INTO conversations (uuid, recent_time) " +
+                "VALUES ("+ chatMessage.getUuid() +", '" + chatMessage.getTimestamp() + "');";
+        db.execSQL(sqlQuery);
+        db.close();
+
+    }
+
     public List<ChatMessage> returnAllMessages(){
         List<ChatMessage> messageList = new ArrayList<ChatMessage>();
 
@@ -144,6 +172,29 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }
 
         return messageList;
+    }
+
+    public List<Pair<Long, String>> returnAllConversations(){
+
+        List<Pair<Long, String>> entries = new ArrayList<Pair<Long, String>>();
+        String selectQuery = "SELECT *  FROM conversations ORDER by datetime(recent_time) DESC ";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                //read from db row
+                Pair<Long, String> newRow = new Pair<>(Long.parseLong(cursor.getString(0)), (cursor.getString(1)));
+
+                //add to list
+                entries.add(newRow);
+
+            } while (cursor.moveToNext());
+        }
+
+        return entries;
     }
 
     //method for converting bitmap to byte array for storing in db

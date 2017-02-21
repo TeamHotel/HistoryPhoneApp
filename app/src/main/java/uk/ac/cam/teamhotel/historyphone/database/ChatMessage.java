@@ -7,6 +7,9 @@ public class ChatMessage {
     private boolean from_user;
     private String timestamp;
 
+    //associated uuid, for easier processing
+    private long uuid;
+
     //getters and setters
     public Integer getMessage_id() {
         return message_id;
@@ -42,5 +45,13 @@ public class ChatMessage {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(long uuid) {
+        this.uuid = uuid;
     }
 }

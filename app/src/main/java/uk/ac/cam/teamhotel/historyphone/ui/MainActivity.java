@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
+import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,10 +30,11 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
 
-    ArtifactLoader artifactLoader;
+    private DatabaseHelper dbhelper;
+    private ArtifactLoader artifactLoader;
 
-    TabLayout tabLayout;
-    ViewPager viewPager;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.ViewPager);
         tabLayout = (TabLayout) findViewById(R.id.TabLayout);
+
+        // Create the database helper.
+        dbhelper = new DatabaseHelper(this);
 
         // Create the artifact loader.
         artifactLoader = new ArtifactLoader();
@@ -79,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Activity created.");
+
+
     }
 
     /**

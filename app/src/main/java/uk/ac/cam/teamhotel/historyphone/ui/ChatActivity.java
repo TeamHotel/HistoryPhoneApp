@@ -32,7 +32,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         //get artifact name passed from previous fragment view
-        ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
+        //ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
         uuid = getIntent().getLongExtra("UUID", 123L);
 
         //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
@@ -41,18 +41,15 @@ public class ChatActivity extends AppCompatActivity {
         loadChatListFromDB();
 
         chatMessageList.clear();
-        ChatMessage exampleMessage = new ChatMessage();
-        exampleMessage.setFrom_user(false);
-        exampleMessage.setMessage_text("Hello, world.");
-        exampleMessage.setTimestamp("sent: 11:00am");
 
-        ChatMessage exampleMessage2 = new ChatMessage();
-        exampleMessage2.setFrom_user(true);
-        exampleMessage2.setMessage_text("Hello, from a user.");
-        exampleMessage2.setTimestamp("sent: 11:01am");
-
-        chatMessageList.add(exampleMessage);
-        chatMessageList.add(exampleMessage2);
+        //send 'init' message and server will reply with object greeting
+        new MessageAsyncTask().execute(new MessageContainer("init", uuid));
+//        ChatMessage exampleMessage2 = new ChatMessage();
+//        exampleMessage2.setFrom_user(true);
+//        exampleMessage2.setMessage_text("Hello, from a user.");
+//        exampleMessage2.setTimestamp("sent: 11:01am");
+//
+//        chatMessageList.add(exampleMessage2);
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(getApplicationContext(),chatMessageList );
@@ -72,11 +69,19 @@ public class ChatActivity extends AppCompatActivity {
         newMessage.setMessage_text(message);
         newMessage.setFrom_user(true);
         newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
+        newMessage.setUuid(uuid);
 
-        //dbHelper.addMessage(newMessage, ARTIFACT_NAME );
+        //add message to local db messages table
+        dbHelper.addMessage(newMessage, ARTIFACT_NAME );
+
+        //add or update the conversations table with the most recent timestamp for the current Artifact
+        dbHelper.addToOrUpdateConversations(newMessage);
+
         chatMessageList.add(newMessage);
         //reset the text view to empty
         editText.setText("");
+
+
 
         //Send message to server and receive reply.
         new MessageAsyncTask().execute(new MessageContainer(message, uuid));
@@ -86,11 +91,13 @@ public class ChatActivity extends AppCompatActivity {
      * Called when loading a conversation.
      */
     public void loadChatListFromDB(){
-        //TODO: implement - load messages from DB into ArrayList.
+
         chatMessageList = dbHelper.returnAllMessages();
 
     }
 
+
+    //this is used to send messages and receive responses - it assumes that messages have already been saved.
     private class MessageAsyncTask extends AsyncTask<MessageContainer, Void, String> {
 
         @Override
@@ -114,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
                 //update list of items displayed
                 adapter.notifyDataSetChanged();
             } else { //no response received - i.e. no connection to server or error with response
-                Snackbar.make(findViewById(R.id.chat_list), "Your message was NOT sent", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.chat_list), "You have lost connection", Snackbar.LENGTH_LONG).show();
             }
             super.onPostExecute(reply);
         }
