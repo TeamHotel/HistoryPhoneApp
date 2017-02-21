@@ -59,7 +59,8 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
             message_text.setText(chatMessage.getMessage_text());
             timestamp.setText(chatMessage.getTimestamp());
             if(type ==0){
-                id_image.setImageBitmap(appCache.get(chatMessage.getUuid()).getPicture());
+                //id_image.setImageBitmap(appCache.get(chatMessage.getUuid()).getPicture());
+                id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
             }else{
                 //user image - ic_launcher for now
                 //TODO: add a different user image maybe

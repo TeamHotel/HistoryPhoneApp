@@ -65,6 +65,8 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
                 ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
                 Bitmap image = BitmapFactory.decodeStream(imageStream);
                 imageView.setImageBitmap(image);
+            } else{
+                imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
             }
         }
 

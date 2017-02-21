@@ -1,6 +1,10 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
+import android.graphics.BitmapFactory;
 import android.util.LongSparseArray;
+
+import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 /**
  * Simple cache of artifact objects, indexed by beacon UUID.
@@ -18,7 +22,11 @@ public class ArtifactCache {
     private ArtifactCache() {
         cache = new LongSparseArray<>();
         // TODO: Remove once artifact loading from server works.
-        cache.put(0L, new Artifact(0L, "Thing", "Some friccin type of thingo", null));
+        Artifact test1 = new Artifact(0L, "Thing", "Some friccin type of thingo", null);
+        Artifact test2 = new Artifact(123L, "Thing2", "test 2", null);
+        cache.put(0L, test1 );
+        cache.put(123L, test2);
+
     }
 
     //use this method to get a single instance of the class

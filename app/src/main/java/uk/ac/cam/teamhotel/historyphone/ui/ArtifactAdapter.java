@@ -24,6 +24,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
+import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class ArtifactAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
@@ -70,6 +71,9 @@ public class ArtifactAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             titleView.setText("Loading...");
             descriptionView.setText("");
         } else {
+
+
+
             // Set parameters of artifact tile.
             titleView.setText(artifact.getName());
             descriptionView.setText(artifact.getDescription());
@@ -80,7 +84,14 @@ public class ArtifactAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                 ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
                 Bitmap image = BitmapFactory.decodeStream(imageStream);
                 imageView.setImageBitmap(image);
+            }else{
+                imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
+                artifact.setPicture(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
             }
+
+            DatabaseHelper dbhelper = new DatabaseHelper(this.getContext());
+            dbhelper.addArtifact(artifact);
+
         }
         // TODO: Reformat as resource string.
         distanceView.setText(String.valueOf(distance) + "m");

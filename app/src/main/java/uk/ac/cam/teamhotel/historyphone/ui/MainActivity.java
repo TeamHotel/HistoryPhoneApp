@@ -27,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        dbhelper.clearConversations();
+        dbhelper.clearMessages();
 
         viewPager = (ViewPager) findViewById(R.id.ViewPager);
         tabLayout = (TabLayout) findViewById(R.id.TabLayout);
