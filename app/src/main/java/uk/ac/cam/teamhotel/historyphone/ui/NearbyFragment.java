@@ -1,8 +1,6 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 
@@ -20,10 +17,10 @@ import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
-import uk.ac.cam.teamhotel.historyphone.utils.ListTools;
+import uk.ac.cam.teamhotel.historyphone.ble.BluetoothNotSupportedException;
+import uk.ac.cam.teamhotel.historyphone.utils.StreamTools;
 
 // TODO: Add database integration (Harry is currently looking into this).
-// TODO: Add methods for interacting with bluetooth beacons and pulling the Artifact meta-data dynamically.
 
 public class NearbyFragment extends Fragment {
 
@@ -32,29 +29,44 @@ public class NearbyFragment extends Fragment {
     private boolean isCreated = false;
     private boolean loaderProvided = false;
     private ArtifactLoader artifactLoader = null;
-    private Observable<ArrayList<Pair<Artifact, Float>>> entriesStream = null;
+    private Observable<Pair<Artifact, Float>> entriesStream = null;
 
     private void createPipeline() {
-        BeaconScanner scanner = BeaconScanner.getInstance();
+        BeaconScanner scanner;
+        try {
+            scanner = BeaconScanner.getInstance();
+        } catch (BluetoothNotSupportedException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Stop scanning while the beacon pipeline is set up.
         scanner.stop();
 
-        // Sort each scan of beacons, increasing by distance, then unzip into two separate arrays.
-        Observable<Pair<ArrayList<Long>, ArrayList<Float>>> listsStream =
-                scanner.getBeaconStream()
-                .map(beacons -> {
-                    Collections.sort(
-                            beacons,
-                            (left, right) -> left.getDistance().compareTo(right.getDistance()));
-                    return beacons;
+        // Compose the pipeline.
+        Log.i(TAG, "Composing nearby beacon pipeline...");
+        entriesStream = scanner.getBeaconStream()
+                // Load Artifact objects from beacon UUIDs.
+                .compose(StreamTools.mapLeft(artifactLoader::load))
+                // Group the pairs by their beacon UUID.
+                .groupBy(pair -> pair.first.getUUID())
+                // Send a timeout to remove stale entries from the list.
+                .map(stream -> {
+                    // Wrap in an array to get around Java's weird closure semantics.
+                    final Artifact[] group = new Artifact[] { null };
+                    return stream
+                            // Store the artifact this stream is grouped by.
+                            .doOnNext(pair -> group[0] = pair.first)
+                            // After a timeout without seeing this artifact, throw an error.
+                            .timeout(4000, TimeUnit.MILLISECONDS)
+                            // When an error is streamed, forward the group artifact at +inf metres.
+                            .onErrorReturn(error -> new Pair<>(
+                                    group[0],
+                                    Float.POSITIVE_INFINITY
+                            ));
                 })
-                .map(ListTools::unzipPairs);
-        // Load artifacts from the UUIDs stream.
-        Observable<ArrayList<Artifact>> artifactsStream =
-                artifactLoader.loadScanStream(listsStream.map(ListTools::projLeft));
-        Observable<ArrayList<Float>> distancesStream =
-                listsStream.map(ListTools::projRight);
-        // Zip the artifact and distances streams back together.
-        entriesStream = Observable.zip(artifactsStream, distancesStream, ListTools::zipPairs);
+                // Recombine the streams into one.
+                .flatMap(stream -> stream);
 
         // TODO: If Bluetooth is enabled...
         scanner.start();
@@ -74,7 +86,7 @@ public class NearbyFragment extends Fragment {
             View rootView = getView();
             assert rootView != null;
             ListView listView = (ListView) rootView.findViewById(R.id.nearby_list);
-            listView.setAdapter(new ArtifactAdapter(getActivity(), entriesStream));
+            listView.setAdapter(new NearbyAdapter(getActivity(), entriesStream));
         }
     }
 
@@ -98,7 +110,7 @@ public class NearbyFragment extends Fragment {
 
             // Pass artifact name and UUID to chat session.
             Pair<Artifact, Float> entry =
-                    ((ArtifactAdapter) listView.getAdapter()).getItem(position);
+                    ((NearbyAdapter) listView.getAdapter()).getItem(position);
             assert entry != null;
             if (entry.first == null) {
                 Log.d(TAG, "NULL ARTIFACT");
@@ -112,7 +124,7 @@ public class NearbyFragment extends Fragment {
         });
         // Set the adapter of the list view to track the entries stream.
         if (loaderProvided) {
-            listView.setAdapter(new ArtifactAdapter(getActivity(), entriesStream));
+            listView.setAdapter(new NearbyAdapter(getActivity(), entriesStream));
         }
 
         isCreated = true;

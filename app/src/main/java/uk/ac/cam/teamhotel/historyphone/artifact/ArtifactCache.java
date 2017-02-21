@@ -27,6 +27,7 @@ public class ArtifactCache {
         cache.put(0L, test1 );
         cache.put(123L, test2);
 
+        cache.put(56L, new Artifact(56L, "Thing", "Some friccin type of thingo", null));
     }
 
     //use this method to get a single instance of the class

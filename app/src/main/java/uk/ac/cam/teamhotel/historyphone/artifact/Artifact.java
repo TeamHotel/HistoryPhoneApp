@@ -6,6 +6,8 @@ import android.util.Log;
 public class Artifact {
     private static final String TAG = "Artifact";
 
+    public static final Artifact LOADING = new Artifact(-1, "", "", null);
+
     private long uuid;
     private String name;
     private String description;

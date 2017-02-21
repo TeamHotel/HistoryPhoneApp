@@ -1,13 +1,19 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
@@ -15,12 +21,20 @@ import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
-    private DatabaseHelper dbhelper = new DatabaseHelper(this);
-    ArtifactLoader artifactLoader;
+    public static final String TAG = "MainActivity";
 
-    TabLayout tabLayout;
-    ViewPager viewPager;
+    private static final String[] permissions = new String[] {
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
+
+    private DatabaseHelper dbhelper;
+    private ArtifactLoader artifactLoader;
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.ViewPager);
         tabLayout = (TabLayout) findViewById(R.id.TabLayout);
+
+        // Create the database helper.
+        dbhelper = new DatabaseHelper(this);
 
         // Create the artifact loader.
         artifactLoader = new ArtifactLoader();
@@ -55,6 +72,19 @@ public class MainActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(tab.getPosition());
             }
         });
+
+        // Get Bluetooth and location permissions.
+        ArrayList<String> permissionsNeeded = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(permission);
+            }
+        }
+        if (permissionsNeeded.size() > 0) {
+            ActivityCompat.requestPermissions(this,
+                    permissionsNeeded.toArray(new String[permissionsNeeded.size()]), 0);
+        }
 
         Log.i(TAG, "Activity created.");
 
