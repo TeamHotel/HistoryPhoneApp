@@ -1,93 +1,150 @@
 package uk.ac.cam.teamhotel.historyphone.ble;
 
-import android.support.v4.util.Pair;
-
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
+import android.util.Log;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 /**
  * Singleton class to scan for beacons.
  */
 public class BeaconScanner {
 
+    public static final String TAG = "BeaconScanner";
+
     private static BeaconScanner instance;
 
-    public static BeaconScanner getInstance() {
+    public static BeaconScanner getInstance() throws BluetoothNotSupportedException {
         if (instance == null) {
             instance = new BeaconScanner();
         }
         return instance;
     }
 
-    private Observable<ArrayList<Beacon>> beaconStream;
-    private AtomicBoolean scanning;
-    private int interval;
-
-    private Pair<Long, ArrayList<Beacon>> lastScan;
-
-    // TODO: More robust fix to stream issue. Shouldn't be using map for scans.
-    private ArrayList<Beacon> cachedScan(long tick) {
-        // If the requested scan is cached, return it.
-        if (lastScan != null && lastScan.first == tick) {
-            return lastScan.second;
-        }
-
-        // TODO: Replace with a call to a ScanProvider once implemented.
-        // Dummy scan for beacons.
-        ArrayList<Beacon> beacons = new ArrayList<>();
-        beacons.add(new Beacon(0L,   0.0f));
-        beacons.add(new Beacon(453L, 1.0f));
-        for (int i = 0; i < new Random().nextInt(7); i++) {
-            beacons.add(new Beacon(23L, 2.0f + i));
-        }
-
-        // Cache the current scan.
-        lastScan = new Pair<>(tick, beacons);
-        return beacons;
-    }
+    private boolean scanning;
+    private Observable<Beacon> beaconStream;
+    private ObservableEmitter<Beacon> beaconEmitter;
+    private BluetoothAdapter adapter;
 
     /**
      * Create a new beacon stream, ready to emit beacons once scanning is started.
      */
-    private BeaconScanner() {
-        scanning = new AtomicBoolean(false);
-        interval = 2000;
-        beaconStream = Observable
-                .interval(interval, TimeUnit.MILLISECONDS, Schedulers.single())
-                .filter(tick -> {
-                    // Only forward ticks along the stream while we are scanning.
-                    return scanning.get();
-                })
-                .map(this::cachedScan);
+    private BeaconScanner() throws BluetoothNotSupportedException {
+        Log.i(TAG, "Initialising beacon scanner.");
+        scanning = false;
+        beaconStream = Observable.create(new ObservableOnSubscribe<Beacon>() {
+            @Override
+            public void subscribe(ObservableEmitter<Beacon> emitter) throws Exception {
+                beaconEmitter = emitter;
+            }
+        });
+        adapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (adapter == null) {
+            Log.e(TAG, "Default Bluetooth adapter is null.");
+            throw new BluetoothNotSupportedException();
+        }
     }
 
     /**
-     * Set the scan interval in milliseconds.
+     * Scan callback object used to emit beacons on the beacon stream.
      */
-    public void setInterval(int interval) { this.interval = interval; }
+    private ScanCallback scanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            if (result.getScanRecord() == null) {
+                Log.w(TAG, "Bad BLE scan received.");
+                return;
+            }
+
+            int rssi = result.getRssi();
+            byte[] record = result.getScanRecord().getBytes();
+
+            // Extract the UUID.
+            if (record[18] != -6 || record[19] != -6 || record[20] != -6) {
+                Log.v(TAG, "Scanned BLE device: " + result.getScanRecord().getDeviceName() +
+                        "@" + rssi + "dBm");
+                return;
+            }
+
+            long uuid = (record[21] << 1) + record[22];
+            float dist = 100.0f - rssi;  // TODO: Replace with actual distance formula.
+
+            Beacon beacon = new Beacon(uuid, dist);
+            Log.d(TAG, "Scanned beacon: " + beacon.toString());
+            beaconEmitter.onNext(beacon);
+        }
+
+        @Override
+        public void onScanFailed(int code) {
+            Log.e(TAG, "BLE scan failed.");
+        }
+    };
 
     /**
-     * Begin scanning for beacons on the next tick.
+     * Begin emitting beacons on the beacon stream.
      */
-    public void start() { scanning.set(true); }
+    public void start() {
+        // If we're already scanning, we're done.
+        if (scanning){
+            return;
+        }
+
+        // Enable Bluetooth if not already enabled.
+        if (!adapter.isEnabled()) {
+            Log.w(TAG, "Could not begin scanning for beacons: adapter disabled.");
+            return;
+        }
+
+        // Get the BLE scanner. If this is null, Bluetooth may not be enabled.
+        BluetoothLeScanner scanner = adapter.getBluetoothLeScanner();
+        if (scanner == null) {
+            Log.w(TAG, "Could not begin scanning for beacons: BLE scanner null.");
+            return;
+        }
+        scanner.startScan(scanCallback);
+
+        scanning = true;
+    }
 
     /**
-     * Cease scanning for beacons at the next tick.
+     * Cease emitting beacons on the beacon stream.
      */
-    public void stop() { scanning.set(false); }
+    public void stop() {
+        // If we weren't scanning, we're done.
+        if (!scanning){
+            return;
+        }
+
+        // Enable Bluetooth if not already enabled.
+        if (!adapter.isEnabled()) {
+            scanning = false;
+            return;
+        }
+
+        // Get the BLE scanner. If this is null, Bluetooth may not be enabled.
+        BluetoothLeScanner scanner = adapter.getBluetoothLeScanner();
+        if (scanner == null) {
+            Log.w(TAG, "Could not retrieve scanner to stop scanning.");
+            return;
+        }
+        scanner.stopScan(scanCallback);
+
+        scanning = false;
+    }
 
     /**
      * @return whether the scanner is currently scanning for beacons.
      */
-    public boolean isScanning() { return scanning.get(); }
+    public boolean isScanning() { return scanning; }
 
     /**
      * @return a reference to the beacon stream for observation purposes.
      */
-    public Observable<ArrayList<Beacon>> getBeaconStream() { return beaconStream; }
+    public Observable<Beacon> getBeaconStream() { return beaconStream; }
 }

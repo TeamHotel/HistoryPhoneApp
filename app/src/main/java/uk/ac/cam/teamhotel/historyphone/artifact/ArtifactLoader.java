@@ -2,9 +2,6 @@ package uk.ac.cam.teamhotel.historyphone.artifact;
 
 import android.os.AsyncTask;
 
-import java.util.ArrayList;
-
-import io.reactivex.Observable;
 import uk.ac.cam.teamhotel.historyphone.server.MetadataQuery;
 
 public class ArtifactLoader {
@@ -21,21 +18,22 @@ public class ArtifactLoader {
     /**
      * Load a single Artifact object from the cache. If the Artifact is not present
      * in the cache, it is loaded from the database. If the Artifact is not present
-     * in the database, null is returned and a request made to the server.
+     * in the database, a placeholder is returned and a request made to the server.
      *
      * @param uuid UUID of the requested Artifact object.
-     * @return a reference to the loaded artifact object, or null if not found.
+     * @return a reference to the loaded artifact object, or a placeholder if not found.
      */
     public Artifact load(Long uuid) {
         Artifact artifact = artifactCache.get(uuid);
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
-            // TODO: Request artifact from local database.
+            // TODO: Construct Artifact object from local database.
         }
         // If the artifact metadata is not present in the db, concurrently retrieve it
-        // from the server and return null.
+        // from the server and return the loading placeholder artifact.
         if (artifact == null) {
             retrieve(uuid);
+            return Artifact.LOADING;
         }
         return artifact;
     }
@@ -51,24 +49,6 @@ public class ArtifactLoader {
         new ArtifactRetrievalTask().execute(uuid);
     }
 
-    /**
-     * Return a stream to track incoming UUID arrays and convert them to Artifact
-     * arrays, making use of a cache (the same UUID will always return the same,
-     * immutable artifact object).
-     *
-     * @param uuidsStream Rx observable stream of UUID arrays.
-     */
-    public Observable<ArrayList<Artifact>> loadScanStream(Observable<ArrayList<Long>> uuidsStream) {
-        return uuidsStream
-                .map(uuids -> {
-                    // Map a list of beacon UUIDs to a corresponding list of artifacts.
-                    ArrayList<Artifact> artifacts = new ArrayList<>();
-                    for (int i = 0; i < uuids.size(); i++) {
-                        artifacts.add(load(uuids.get(i)));
-                    }
-                    return artifacts;
-                });
-    }
 
     private class ArtifactRetrievalTask extends AsyncTask<Long, Void, Artifact> {
 

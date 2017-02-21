@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 public class Artifact {
 
+    public static final Artifact LOADING = new Artifact(-1, "", "", null);
+
     private long uuid;
     private String name;
     private String description;
