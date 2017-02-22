@@ -2,6 +2,7 @@ package uk.ac.cam.teamhotel.historyphone.ui;
 
 import java.util.concurrent.TimeUnit;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
@@ -20,32 +21,26 @@ import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
 import uk.ac.cam.teamhotel.historyphone.ble.BluetoothNotSupportedException;
 import uk.ac.cam.teamhotel.historyphone.utils.StreamTools;
 
-// TODO: Add database integration (Harry is currently looking into this).
+import static android.app.Activity.RESULT_OK;
 
 public class NearbyFragment extends Fragment {
 
     public static final String TAG = "NearbyFragment";
 
-    private boolean isCreated = false;
-    private boolean loaderProvided = false;
-    private ArtifactLoader artifactLoader = null;
-    private Observable<Pair<Artifact, Float>> entriesStream = null;
+    private static final int REQUEST_ENABLE_BLUETOOTH = 1;
 
+    private Observable<Pair<Artifact, Float>> entriesStream;
+
+    /**
+     * Construct the artifact entry pipeline from the raw beacon stream.
+     */
     private void createPipeline() {
-        BeaconScanner scanner;
-        try {
-            scanner = BeaconScanner.getInstance();
-        } catch (BluetoothNotSupportedException e) {
-            e.printStackTrace();
-            return;
-        }
-
         // Stop scanning while the beacon pipeline is set up.
-        scanner.stop();
+        stopScanning();
 
         // Compose the pipeline.
         Log.i(TAG, "Composing nearby beacon pipeline...");
-        entriesStream = scanner.getBeaconStream()
+        entriesStream = BeaconScanner.getInstance().getBeaconStream()
                 // Load Artifact objects from beacon UUIDs.
                 .compose(StreamTools.mapLeft(ArtifactLoader::load))
                 // Group the pairs by their beacon UUID.
@@ -68,38 +63,55 @@ public class NearbyFragment extends Fragment {
                 // Recombine the streams into one.
                 .flatMap(stream -> stream);
 
-        // TODO: If Bluetooth is enabled...
-        scanner.start();
-        // TODO: ...else prompt for Bluetooth.
+        // Begin scanning for beacons.
+        startScanning();
     }
 
-    public void setArtifactLoader(ArtifactLoader artifactLoader) {
-        this.artifactLoader = artifactLoader;
-        loaderProvided = true;
+    /**
+     * Start scanning for beacons via the beacon scanner. If Bluetooth is
+     * not currently enabled, prompt the user to enable it.
+     */
+    private void startScanning() {
+        BeaconScanner scanner = BeaconScanner.getInstance();
+        try {
+            if (scanner.isBluetoothEnabled()) {
+                // If Bluetooth is currently enabled, start scanning.
+                scanner.start();
+            } else {
+                // Otherwise, prompt the user to enable Bluetooth.
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(intent, REQUEST_ENABLE_BLUETOOTH);
+            }
+        } catch (BluetoothNotSupportedException e) {
+            // TODO: Indicate to user that Bluetooth is not supported.
+        }
+    }
 
-        // If we have already created the view, set up the beacon scanning
-        // pipeline immediately.
-        if (isCreated) {
-            createPipeline();
+    /**
+     * Stop scanning for beacons via the beacon scanner.
+     */
+    private void stopScanning() {
+        BeaconScanner.getInstance().stop();
+    }
 
-            // Set the adapter of the list view to track the entries stream.
-            View rootView = getView();
-            assert rootView != null;
-            ListView listView = (ListView) rootView.findViewById(R.id.nearby_list);
-            listView.setAdapter(new NearbyAdapter(getActivity(), entriesStream));
+    @Override
+    public void onActivityResult(int request, int result, Intent data) {
+        switch (request) {
+            case REQUEST_ENABLE_BLUETOOTH:
+                // This is the result of prompting the user to enable Bluetooth.
+                // Treat the result as their preference on whether we should be scanning.
+                if (result == RESULT_OK) {
+                    startScanning();
+                } else {
+                    stopScanning();
+                }
+                break;
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // If the artifact loader has already been provided, we may create the
-        // beacon scanning pipeline immediately. Otherwise, it will be created
-        // on calling setArtifactLoader.
-        if (loaderProvided) {
-            createPipeline();
-        }
-
         // Inflate a new view with the nearby fragment layout.
         View rootView = inflater.inflate(R.layout.fragment_nearby, container, false);
 

@@ -19,7 +19,7 @@ public class BeaconScanner {
 
     private static BeaconScanner instance;
 
-    public static BeaconScanner getInstance() throws BluetoothNotSupportedException {
+    public static BeaconScanner getInstance() {
         if (instance == null) {
             instance = new BeaconScanner();
         }
@@ -34,7 +34,7 @@ public class BeaconScanner {
     /**
      * Create a new beacon stream, ready to emit beacons once scanning is started.
      */
-    private BeaconScanner() throws BluetoothNotSupportedException {
+    private BeaconScanner() {
         Log.i(TAG, "Initialising beacon scanner.");
         scanning = false;
         beaconStream = Observable.create(new ObservableOnSubscribe<Beacon>() {
@@ -44,11 +44,6 @@ public class BeaconScanner {
             }
         });
         adapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (adapter == null) {
-            Log.e(TAG, "Default Bluetooth adapter is null.");
-            throw new BluetoothNotSupportedException();
-        }
     }
 
     /**
@@ -89,10 +84,16 @@ public class BeaconScanner {
     /**
      * Begin emitting beacons on the beacon stream.
      */
-    public void start() {
+    public void start() throws BluetoothNotSupportedException {
         // If we're already scanning, we're done.
         if (scanning){
             return;
+        }
+
+        // If the adapter is null, Bluetooth is not supported.
+        if (adapter == null) {
+            Log.e(TAG, "Default Bluetooth adapter is null.");
+            throw new BluetoothNotSupportedException();
         }
 
         // Enable Bluetooth if not already enabled.
@@ -116,8 +117,8 @@ public class BeaconScanner {
      * Cease emitting beacons on the beacon stream.
      */
     public void stop() {
-        // If we weren't scanning, we're done.
-        if (!scanning){
+        // If we weren't scanning, or Bluetooth is not supported, we're done.
+        if (!scanning || adapter == null){
             return;
         }
 
@@ -142,6 +143,11 @@ public class BeaconScanner {
      * @return whether the scanner is currently scanning for beacons.
      */
     public boolean isScanning() { return scanning; }
+
+    /**
+     * @return whether Bluetooth is current enabled.
+     */
+    public boolean isBluetoothEnabled() { return adapter.isEnabled(); }
 
     /**
      * @return a reference to the beacon stream for observation purposes.
