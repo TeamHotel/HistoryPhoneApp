@@ -146,7 +146,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
         ImageView imageView = (ImageView) view.findViewById(R.id.artifact_image);
 
         // Populate the data into the template view using the artifact object.
-        if (artifact == null) {
+        if (artifact == Artifact.LOADING) {
             // TODO: Display flashier "loading" tile.
             titleView.setText("Loading...");
             descriptionView.setText("");

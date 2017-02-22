@@ -47,7 +47,7 @@ public class NearbyFragment extends Fragment {
         Log.i(TAG, "Composing nearby beacon pipeline...");
         entriesStream = scanner.getBeaconStream()
                 // Load Artifact objects from beacon UUIDs.
-                .compose(StreamTools.mapLeft(artifactLoader::load))
+                .compose(StreamTools.mapLeft(ArtifactLoader::load))
                 // Group the pairs by their beacon UUID.
                 .groupBy(pair -> pair.first.getUUID())
                 // Send a timeout to remove stale entries from the list.
@@ -122,12 +122,10 @@ public class NearbyFragment extends Fragment {
 
             startActivity(intent);
         });
-        // Set the adapter of the list view to track the entries stream.
-        if (loaderProvided) {
-            listView.setAdapter(new NearbyAdapter(getActivity(), entriesStream));
-        }
-
-        isCreated = true;
+        // Create the beacon scanning pipeline and set the list
+        // adapter to track the entries stream.
+        createPipeline();
+        listView.setAdapter(new NearbyAdapter(getActivity(), entriesStream));
 
         return rootView;
     }
