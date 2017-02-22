@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 public class DatabaseHelper extends SQLiteOpenHelper{
 
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     // Database Name
     private static final String DATABASE_NAME = "HistoryPhoneDB";
 
@@ -45,7 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             "uuid INTEGER NOT NULL, " +
             "title TEXT NOT NULL, "+
             "description TEXT NOT NULL, " +
-            "image BLOB NOT NULL )";
+            "image BLOB )";
 
      // SQL statement to create messages table
      private static final String CREATE_MESSAGE_TABLE = "CREATE TABLE IF NOT EXISTS messages ( " +
@@ -104,11 +105,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public void addMessage(ChatMessage chatMessage, String artifact_name){
+    public void addMessage(ChatMessage chatMessage){
         SQLiteDatabase db = this.getWritableDatabase();
 
         //get id of artifact that we want to add messages for
-        String get_id_query = "SELECT artifact_id FROM artifacts WHERE title="+artifact_name;
+        String get_id_query = "SELECT artifact_id FROM artifacts WHERE uuid="+chatMessage.getUuid();
         final Cursor cursor = db.rawQuery(get_id_query, null);
         int id =0;
         if (cursor != null) {
@@ -143,10 +144,39 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public List<ChatMessage> returnAllMessages(){
+    //debug purposes
+    public void printConversations(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM conversations";
+        Cursor cursor = db.rawQuery(sqlQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d("CONVOS",cursor.getString(0) + " " + cursor.getString(1));
+
+            } while (cursor.moveToNext());
+        }
+
+    }
+
+    //method to delete all conversation records (for recent tab population)
+    public void clearConversations(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM conversations");
+    }
+
+    //method to delete all message records
+    public void clearMessages(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM messages");
+    }
+
+    //TODO: add uuid filtering perhaps
+    public List<ChatMessage> returnAllMessages(Long uuid){
         List<ChatMessage> messageList = new ArrayList<ChatMessage>();
 
-        String selectQuery = "SELECT * FROM messages";
+        String selectQuery = "SELECT * FROM messages, artifacts WHERE messages.artifact_id = artifacts.artifact_id AND artifacts.uuid=" +uuid;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

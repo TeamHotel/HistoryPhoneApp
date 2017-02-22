@@ -33,18 +33,18 @@ public class ChatActivity extends AppCompatActivity {
 
         //get artifact name passed from previous fragment view
         //ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
-        uuid = getIntent().getLongExtra("UUID", 123L);
+        uuid = getIntent().getLongExtra("UUID",0L);
 
         //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
         dbHelper = new DatabaseHelper(this);
         //load in messages from database
         loadChatListFromDB();
 
-        chatMessageList.clear();
+        //chatMessageList.clear();
 
         //send 'init' message and server will reply with object greeting
         new MessageAsyncTask().execute(new MessageContainer("init", uuid));
-//        ChatMessage exampleMessage2 = new ChatMessage();
+//       ChatMessage exampleMessage2 = new ChatMessage();
 //        exampleMessage2.setFrom_user(true);
 //        exampleMessage2.setMessage_text("Hello, from a user.");
 //        exampleMessage2.setTimestamp("sent: 11:01am");
@@ -72,7 +72,19 @@ public class ChatActivity extends AppCompatActivity {
         newMessage.setUuid(uuid);
 
         //add message to local db messages table
-        dbHelper.addMessage(newMessage, ARTIFACT_NAME );
+        dbHelper.addMessage(newMessage );
+
+        //if this is the first message for the conversation, update the recent tab's listview
+        if(chatMessageList.size() < 1){
+
+            // find recent fragment
+            RecentFragment frag = (RecentFragment) getSupportFragmentManager().findFragmentByTag("RecentFragment");
+
+            if(frag != null) {
+                // update the list view
+                frag.updateListView();
+            }
+        }
 
         //add or update the conversations table with the most recent timestamp for the current Artifact
         dbHelper.addToOrUpdateConversations(newMessage);
@@ -81,7 +93,7 @@ public class ChatActivity extends AppCompatActivity {
         //reset the text view to empty
         editText.setText("");
 
-
+        dbHelper.printConversations();
 
         //Send message to server and receive reply.
         new MessageAsyncTask().execute(new MessageContainer(message, uuid));
@@ -92,7 +104,7 @@ public class ChatActivity extends AppCompatActivity {
      */
     public void loadChatListFromDB(){
 
-        chatMessageList = dbHelper.returnAllMessages();
+        chatMessageList = dbHelper.returnAllMessages(uuid);
 
     }
 
@@ -116,7 +128,7 @@ public class ChatActivity extends AppCompatActivity {
                 newMessage.setFrom_user(false);
                 newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
 
-                //dbHelper.addMessage(newMessage, ARTIFACT_NAME );
+                dbHelper.addMessage(newMessage );
                 chatMessageList.add(newMessage);
                 //update list of items displayed
                 adapter.notifyDataSetChanged();

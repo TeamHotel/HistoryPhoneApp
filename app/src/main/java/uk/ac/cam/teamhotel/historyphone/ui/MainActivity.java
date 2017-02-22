@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Create the database helper.
         dbhelper = new DatabaseHelper(this);
+        dbhelper.clearConversations();
+        dbhelper.clearMessages();
 
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));

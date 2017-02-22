@@ -23,6 +23,7 @@ public class RecentFragment extends Fragment {
     public static final String TAG = "RecentFragment";
     private List<Pair<Long, String>> conversationList = new ArrayList<Pair<Long, String>>();
     private DatabaseHelper dbHelper;
+    private ListView listView;
 
     @Nullable
     @Override
@@ -33,9 +34,9 @@ public class RecentFragment extends Fragment {
 
         //setup helper and load list of pairs from database, in order of time
         dbHelper = new DatabaseHelper(this.getActivity());
-        loadArtifactsFromDB();
+        loadConversationsFromDB();
 
-        ListView listView = (ListView) rootView.findViewById(R.id.recent_list);
+        listView = (ListView) rootView.findViewById(R.id.recent_list);
         listView.setAdapter(new RecentAdapter(getActivity(), conversationList));
 
         // Set up the click listener for the list view.
@@ -46,6 +47,8 @@ public class RecentFragment extends Fragment {
             Pair<Long, String> entry =
                     ((RecentAdapter) listView.getAdapter()).getItem(position);
 
+            Log.d(TAG, entry.first.toString());
+
             assert entry != null;
             if (entry.first == null) {
                 Log.d(TAG, "NULL ARTIFACT");
@@ -55,6 +58,8 @@ public class RecentFragment extends Fragment {
             //intent.putExtra("ARTIFACT_TITLE", entry.first.getName());
             intent.putExtra("UUID", entry.first);
 
+
+
             startActivity(intent);
         });
 
@@ -62,12 +67,15 @@ public class RecentFragment extends Fragment {
 
     }
 
-    public void loadArtifactsFromDB(){
+    public void loadConversationsFromDB(){
 
            conversationList = dbHelper.returnAllConversations();
 
     }
 
 
+    public void updateListView() {
 
+        ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
+    }
 }

@@ -161,7 +161,13 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                 ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
                 Bitmap image = BitmapFactory.decodeStream(imageStream);
                 imageView.setImageBitmap(image);
-            }
+            }else{
+                  imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.i    c_launcher));
+                  artifact.setPicture(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_lau    ncher));
+              }
+  
+              DatabaseHelper dbhelper = new DatabaseHelper(this.getContext());
+              dbhelper.addArtifact(artifact);
         }
         // TODO: Reformat as resource string.
         distanceView.setText(String.valueOf(distance) + "m");
