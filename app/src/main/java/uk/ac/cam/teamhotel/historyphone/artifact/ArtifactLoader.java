@@ -21,7 +21,6 @@ public class ArtifactLoader {
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
             // TODO: Request artifact from local database.
-
         }
         // If the artifact metadata is not present in the db, concurrently retrieve it
         // from the server and return the loading placeholder artifact.

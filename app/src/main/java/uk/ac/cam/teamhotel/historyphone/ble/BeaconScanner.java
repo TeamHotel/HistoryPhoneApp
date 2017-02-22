@@ -49,7 +49,7 @@ public class BeaconScanner {
     /**
      * Scan callback object used to emit beacons on the beacon stream.
      */
-    private ScanCallback scanCallback = new ScanCallback() {
+    private final ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             if (result.getScanRecord() == null) {
@@ -96,7 +96,7 @@ public class BeaconScanner {
             throw new BluetoothNotSupportedException();
         }
 
-        // Enable Bluetooth if not already enabled.
+        // If Bluetooth is not enabled, we cannot begin scanning.
         if (!adapter.isEnabled()) {
             Log.w(TAG, "Could not begin scanning for beacons: adapter disabled.");
             return;
@@ -111,6 +111,7 @@ public class BeaconScanner {
         scanner.startScan(scanCallback);
 
         scanning = true;
+        Log.i(TAG, "Started scanning.");
     }
 
     /**
@@ -118,13 +119,14 @@ public class BeaconScanner {
      */
     public void stop() {
         // If we weren't scanning, or Bluetooth is not supported, we're done.
-        if (!scanning || adapter == null){
+        if (!scanning || adapter == null) {
             return;
         }
 
-        // Enable Bluetooth if not already enabled.
+        // If Bluetooth is not enabled, scanning will automatically have been stopped.
         if (!adapter.isEnabled()) {
             scanning = false;
+            Log.i(TAG, "Scanning stopped by adapter.");
             return;
         }
 
@@ -137,6 +139,7 @@ public class BeaconScanner {
         scanner.stopScan(scanCallback);
 
         scanning = false;
+        Log.i(TAG, "Stopped scanning.");
     }
 
     /**

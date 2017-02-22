@@ -3,7 +3,10 @@ package uk.ac.cam.teamhotel.historyphone.ui;
 import java.util.concurrent.TimeUnit;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.util.Pair;
 import android.util.Log;
@@ -65,6 +68,10 @@ public class NearbyFragment extends Fragment {
 
         // Begin scanning for beacons.
         startScanning();
+
+        // Set up the Bluetooth event receiver.
+        getActivity().registerReceiver(bluetoothEventReceiver,
+                new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
     }
 
     /**
@@ -108,6 +115,29 @@ public class NearbyFragment extends Fragment {
                 break;
         }
     }
+
+    /**
+     * Broadcast receiver for Bluetooth events, in order to start/stop scanning.
+     */
+    private final BroadcastReceiver bluetoothEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
+
+            switch (state) {
+                case BluetoothAdapter.STATE_ON:
+                    // The local Bluetooth adapter is on, and ready for use.
+                    startScanning();
+                    break;
+
+                case BluetoothAdapter.STATE_OFF:
+                case BluetoothAdapter.STATE_TURNING_OFF:
+                    // The local Bluetooth adapter is turning off.
+                    stopScanning();
+                    break;
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
