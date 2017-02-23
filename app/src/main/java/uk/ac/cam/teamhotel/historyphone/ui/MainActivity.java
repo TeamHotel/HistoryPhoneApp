@@ -16,7 +16,6 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,28 +29,20 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
 
-    private DatabaseHelper dbhelper = new DatabaseHelper(this);
-    private ArtifactLoader artifactLoader;
-
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private DatabaseHelper dbhelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dbhelper.clearConversations();
-        dbhelper.clearMessages();
-
-        viewPager = (ViewPager) findViewById(R.id.ViewPager);
-        tabLayout = (TabLayout) findViewById(R.id.TabLayout);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.ViewPager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.TabLayout);
 
         // Create the database helper.
         dbhelper = new DatabaseHelper(this);
-
-        // Create the artifact loader.
-        artifactLoader = new ArtifactLoader();
+        dbhelper.clearConversations();
+        dbhelper.clearMessages();
 
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
@@ -88,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Activity created.");
-
-
     }
 
     /**
@@ -106,11 +95,8 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch(position) {
                 case 0:
-                    NearbyFragment nearby = new NearbyFragment();
-                    nearby.setArtifactLoader(artifactLoader);
-                    return nearby;
+                    return new NearbyFragment();
                 case 1:
-                    // TODO: Pass artifact loader.
                     return new RecentFragment();
                 default:
                     return null;

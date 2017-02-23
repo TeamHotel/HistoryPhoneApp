@@ -6,14 +6,7 @@ import uk.ac.cam.teamhotel.historyphone.server.MetadataQuery;
 
 public class ArtifactLoader {
 
-    private ArtifactCache artifactCache;
-
-    /**
-     * Initialise the internal artifact cache.
-     */
-    public ArtifactLoader(/* TODO: Pass db connection. */) {
-        artifactCache = ArtifactCache.getInstance();
-    }
+    private ArtifactLoader() {}
 
     /**
      * Load a single Artifact object from the cache. If the Artifact is not present
@@ -23,12 +16,11 @@ public class ArtifactLoader {
      * @param uuid UUID of the requested Artifact object.
      * @return a reference to the loaded artifact object, or a placeholder if not found.
      */
-    public Artifact load(Long uuid) {
-        Artifact artifact = artifactCache.get(uuid);
+    public static Artifact load(Long uuid) {
+        Artifact artifact = ArtifactCache.getInstance().get(uuid);
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
             // TODO: Request artifact from local database.
-
         }
         // If the artifact metadata is not present in the db, concurrently retrieve it
         // from the server and return the loading placeholder artifact.
@@ -46,12 +38,11 @@ public class ArtifactLoader {
      *
      * @param uuid UUID of the requested artifact.
      */
-    public void retrieve(Long uuid) {
+    public static void retrieve(Long uuid) {
         new ArtifactRetrievalTask().execute(uuid);
     }
 
-
-    private class ArtifactRetrievalTask extends AsyncTask<Long, Void, Artifact> {
+    private static class ArtifactRetrievalTask extends AsyncTask<Long, Void, Artifact> {
 
         private long uuid;
 
@@ -65,7 +56,7 @@ public class ArtifactLoader {
         @Override
         protected void onPostExecute(Artifact artifact) {
             // Store the newly retrieved artifact in the cache.
-            artifactCache.set(uuid, artifact);
+            ArtifactCache.getInstance().set(uuid, artifact);
 
             super.onPostExecute(artifact);
         }

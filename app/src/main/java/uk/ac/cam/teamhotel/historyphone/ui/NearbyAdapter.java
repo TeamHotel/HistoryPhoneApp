@@ -1,14 +1,11 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
-import android.support.v7.util.SortedList;
 import android.util.Log;
-import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,17 +17,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeSet;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactCache;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
@@ -151,7 +142,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
         ImageView imageView = (ImageView) view.findViewById(R.id.artifact_image);
 
         // Populate the data into the template view using the artifact object.
-        if (artifact == null) {
+        if (artifact == Artifact.LOADING) {
             // TODO: Display flashier "loading" tile.
             titleView.setText("Loading...");
             descriptionView.setText("");
@@ -162,10 +153,12 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
             // Format artifact image.
             if (artifact.getPicture() != null) {
+                // If there is an image associated with the artifact, display it.
                 byte[] outImage = getBitmapAsByteArray(artifact.getPicture());
                 ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
                 Bitmap image = BitmapFactory.decodeStream(imageStream);
                 imageView.setImageBitmap(image);
+<<<<<<< HEAD
             }else{
                   imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
                   artifact.setPicture(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
@@ -174,6 +167,16 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             //temporary fix for now
               DatabaseHelper dbhelper = new DatabaseHelper(this.getContext());
               dbhelper.addArtifact(artifact);
+=======
+            } else {
+                // Otherwise, fall back on the launcher icon.
+                imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
+                        R.mipmap.ic_launcher));
+            }
+  
+            DatabaseHelper dbhelper = new DatabaseHelper(this.getContext());
+            dbhelper.addArtifact(artifact);
+>>>>>>> ed59ceb90448aa76821aa10dd6d2e5daf3e06151
         }
         // TODO: Reformat as resource string.
         distanceView.setText(String.valueOf(distance) + "m");

@@ -25,7 +25,6 @@ public class Artifact {
     public String getName() { return name; }
     public String getDescription() { return description; }
     public Bitmap getPicture() { return picture; }
-    public void setPicture(Bitmap pic){this.picture = pic;}
 
     @Override
     public String toString() {
