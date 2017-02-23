@@ -25,9 +25,13 @@ public class ArtifactLoader {
      */
     public Artifact load(Long uuid) {
         Artifact artifact = artifactCache.get(uuid);
+
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
-            // TODO: Request artifact from local database.
+
+            // Attempt to get Artifact from local database
+            artifact = databaseHelper.getArtifact(uuid);
+
         }
         // If the artifact metadata is not present in the db, concurrently retrieve it
         // from the server and return the loading placeholder artifact.

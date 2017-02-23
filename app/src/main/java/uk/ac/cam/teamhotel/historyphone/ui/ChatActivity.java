@@ -31,8 +31,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        //get artifact name passed from previous fragment view
-        //ARTIFACT_NAME = getIntent().getStringExtra("ARTIFACT_NAME");
+        //get artifact uuid passed from previous fragment view
         uuid = getIntent().getLongExtra("UUID",0L);
 
         //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
@@ -40,16 +39,8 @@ public class ChatActivity extends AppCompatActivity {
         //load in messages from database
         loadChatListFromDB();
 
-        //chatMessageList.clear();
-
         //send 'init' message and server will reply with object greeting
        // new MessageAsyncTask().execute(new MessageContainer("init", uuid));
-//       ChatMessage exampleMessage2 = new ChatMessage();
-//        exampleMessage2.setFrom_user(true);
-//        exampleMessage2.setMessage_text("Hello, from a user.");
-//        exampleMessage2.setTimestamp("sent: 11:01am");
-//
-//        chatMessageList.add(exampleMessage2);
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(getApplicationContext(),chatMessageList );
@@ -109,7 +100,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    //this is used to send messages and receive responses - it assumes that messages have already been saved.
+    /**
+     * This is used to send messages and receive responses - it assumes that messages have already been saved.
+     */
     private class MessageAsyncTask extends AsyncTask<MessageContainer, Void, String> {
 
         @Override
