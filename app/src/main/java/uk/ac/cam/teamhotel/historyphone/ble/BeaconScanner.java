@@ -148,9 +148,11 @@ public class BeaconScanner {
     public boolean isScanning() { return scanning; }
 
     /**
-     * @return whether Bluetooth is current enabled.
+     * @return whether Bluetooth is currently enabled.
      */
-    public boolean isBluetoothEnabled() { return adapter.isEnabled(); }
+    public boolean isBluetoothEnabled() {
+        return (adapter != null) && adapter.isEnabled();
+    }
 
     /**
      * @return a reference to the beacon stream for observation purposes.
