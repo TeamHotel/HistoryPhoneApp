@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
+        viewPager.setOffscreenPageLimit(2);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
