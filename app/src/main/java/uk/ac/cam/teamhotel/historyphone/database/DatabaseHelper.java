@@ -169,6 +169,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("artifact_id", id );
         values.put("message_text", chatMessage.getMessage_text());
         values.put("from_user", chatMessage.isFrom_user());
+        values.put("created_at", chatMessage.getTimestamp());
 
         // insert row
         db.insert(TABLE_MESSAGES, null , values);
@@ -194,7 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void printConversations(){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sqlQuery = "SELECT * FROM conversations";
+        String sqlQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
         Cursor cursor = db.rawQuery(sqlQuery, null);
 
         if (cursor.moveToFirst()) {

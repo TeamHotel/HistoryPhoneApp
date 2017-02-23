@@ -29,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:textAlignment="center"
-            android:text="sent: 11:00am"
             android:textSize="8sp" />
     </LinearLayout>
 
