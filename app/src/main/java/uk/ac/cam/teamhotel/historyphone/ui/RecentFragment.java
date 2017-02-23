@@ -3,6 +3,7 @@ package uk.ac.cam.teamhotel.historyphone.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -67,6 +68,23 @@ public class RecentFragment extends Fragment {
 
     }
 
+    /*@Override
+    public void onResume() {
+
+        ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
+        super.onResume();
+
+    }
+
+    @Override
+    public void setMenuVisibility(final boolean visible) {
+        super.setMenuVisibility(visible);
+        if (visible) {
+            updateListView();
+            ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
+        }
+    }*/
+
     public void loadConversationsFromDB(){
 
            conversationList = dbHelper.returnAllConversations();
@@ -75,7 +93,14 @@ public class RecentFragment extends Fragment {
 
 
     public void updateListView() {
+        loadConversationsFromDB();
 
-        ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
+        // Reload current fragment
+        Fragment currentFragment = getFragmentManager().findFragmentByTag("RecentFragment");
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.detach(currentFragment);
+        fragmentTransaction.attach(currentFragment);
+        fragmentTransaction.commit();
+
     }
 }

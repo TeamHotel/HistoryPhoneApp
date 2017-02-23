@@ -43,7 +43,7 @@ public class ChatActivity extends AppCompatActivity {
         //chatMessageList.clear();
 
         //send 'init' message and server will reply with object greeting
-        new MessageAsyncTask().execute(new MessageContainer("init", uuid));
+       // new MessageAsyncTask().execute(new MessageContainer("init", uuid));
 //       ChatMessage exampleMessage2 = new ChatMessage();
 //        exampleMessage2.setFrom_user(true);
 //        exampleMessage2.setMessage_text("Hello, from a user.");
@@ -96,7 +96,7 @@ public class ChatActivity extends AppCompatActivity {
         dbHelper.printConversations();
 
         //Send message to server and receive reply.
-        new MessageAsyncTask().execute(new MessageContainer(message, uuid));
+       // new MessageAsyncTask().execute(new MessageContainer(message, uuid));
     }
 
     /**
