@@ -64,6 +64,7 @@ public class ArtifactLoader {
             artifactCache.set(uuid, artifact);
 
             // Store the newly retrieved artifact in the database.
+            databaseHelper.addArtifact(artifact);
 
             super.onPostExecute(artifact);
         }
