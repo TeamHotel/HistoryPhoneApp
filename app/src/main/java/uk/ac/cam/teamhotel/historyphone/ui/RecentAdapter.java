@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,11 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactCache;
+import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 
 public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
+
+    public static final String TAG = "RecentAdapter";
 
     public RecentAdapter(Context context, List<Pair<Long, String>> objects) {
         super(context, R.layout.list_item, objects);
@@ -31,14 +34,20 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
     public View getView(int position, View view, @NonNull ViewGroup parent) {
         Pair<Long, String> entry = getItem(position);
 
-        // TODO: Error check this.
-        // Get the current artifact by using the uuid to pull from cache.
-        Artifact artifact = ArtifactCache.getInstance().get(entry.first);
-
         // Check if an existing view is being reused, otherwise inflate the view.
         if (view == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
         }
+
+        // No entries should be null.
+        if (entry == null) {
+            Log.e(TAG, "Null entry found in recents list.");
+            return view;
+        }
+
+        // Get the current artifact by using the uuid to pull from cache.
+        ArtifactLoader artifactLoader = ((MainActivity) getContext()).getArtifactLoader();
+        Artifact artifact = artifactLoader.load(entry.first);
 
         // Lookup view for data population.
         TextView titleView = (TextView) view.findViewById(R.id.artifact_title);

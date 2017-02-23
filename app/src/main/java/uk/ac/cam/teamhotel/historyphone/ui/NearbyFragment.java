@@ -41,11 +41,14 @@ public class NearbyFragment extends Fragment {
         // Stop scanning while the beacon pipeline is set up.
         stopScanning();
 
+        // Get the artifact loader from the parent activity.
+        ArtifactLoader artifactLoader = ((MainActivity) getActivity()).getArtifactLoader();
+
         // Compose the pipeline.
-        Log.i(TAG, "Composing nearby beacon pipeline...");
+        Log.i(TAG, "Constructing nearby beacon pipeline...");
         entriesStream = BeaconScanner.getInstance().getBeaconStream()
                 // Load Artifact objects from beacon UUIDs.
-                .compose(StreamTools.mapLeft(ArtifactLoader::load))
+                .compose(StreamTools.mapLeft(artifactLoader::load))
                 // Group the pairs by their beacon UUID.
                 .groupBy(pair -> pair.first.getUUID())
                 // Send a timeout to remove stale entries from the list.
@@ -164,6 +167,7 @@ public class NearbyFragment extends Fragment {
 
             startActivity(intent);
         });
+
         // Create the beacon scanning pipeline and set the list
         // adapter to track the entries stream.
         createPipeline();

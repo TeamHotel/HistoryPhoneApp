@@ -22,8 +22,6 @@ import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 
 public class ChatAdapter extends ArrayAdapter<ChatMessage> {
 
-    private ArtifactCache appCache = ArtifactCache.getInstance();
-
     public ChatAdapter(Context context, List<ChatMessage> messages) {
         // resource ID = 0 as custom Adapter already handles this
         super(context, 0, messages);

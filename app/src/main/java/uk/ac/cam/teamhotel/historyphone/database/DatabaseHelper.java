@@ -15,81 +15,80 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 
-//TODO: Check workflow of timestamps / datetimes with database and the app
-public class DatabaseHelper extends SQLiteOpenHelper{
+// TODO: Check workflow of timestamps / datetimes with database and the app.
+public class DatabaseHelper extends SQLiteOpenHelper {
 
-    // Database Version
     private static final int DATABASE_VERSION = 3;
-    // Database Name
     private static final String DATABASE_NAME = "HistoryPhoneDB";
 
-
-    //Table Names
+    // Table Names:
     private static final String TABLE_ARTIFACTS = "artifacts";
     private static final String TABLE_MESSAGES = "messages";
     private static final String TABLE_CONVERSATIONS = "conversations";
 
-
-    //Table IDs
+    // Table IDs:
     private static final String ARTIFACTS_ID = "artifact_id";
     private static final String MESSAGES_ID = "message_id";
     private static final String MESSAGES_FOREIGN_KEY = "artifact_id";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
     }
 
-    // SQL statement to create artifact table
-    private static final String CREATE_ARTIFACT_TABLE = "CREATE TABLE IF NOT EXISTS artifacts ( " +
+    /**
+     * SQL statement to create artifact table.
+     */
+    private static final String CREATE_ARTIFACT_TABLE =
+            "CREATE TABLE IF NOT EXISTS artifacts ( " +
             "artifact_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "uuid INTEGER NOT NULL, " +
-            "title TEXT NOT NULL, "+
+            "title TEXT NOT NULL, " +
             "description TEXT NOT NULL, " +
             "image BLOB )";
 
-     // SQL statement to create messages table
-     private static final String CREATE_MESSAGE_TABLE = "CREATE TABLE IF NOT EXISTS messages ( " +
+    /**
+     * SQL statement to create messages table.
+     */
+    private static final String CREATE_MESSAGE_TABLE =
+            "CREATE TABLE IF NOT EXISTS messages ( " +
             "message_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-             "artifact_id INTEGER NOT NULL, " +
-            "message_text TEXT NOT NULL, "+
+            "artifact_id INTEGER NOT NULL, " +
+            "message_text TEXT NOT NULL, " +
             "from_user BOOLEAN NOT NULL, " +
             "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
-             "FOREIGN KEY(artifact_id) REFERENCES artifacts(artifact_id) )";
+            "FOREIGN KEY(artifact_id) REFERENCES artifacts(artifact_id) )";
 
-    // SQL statement to create conversations table
-    private static final String CREATE_CONVERSATIONS_TABLE = "CREATE TABLE IF NOT EXISTS conversations ( " +
+    /**
+     * SQL statement to create conversations table.
+     */
+    private static final String CREATE_CONVERSATIONS_TABLE =
+            "CREATE TABLE IF NOT EXISTS conversations ( " +
             "uuid INTEGER PRIMARY KEY, " +
             "recent_time DATETIME )";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        // create artifacts table
+        // Create artifacts table.
         db.execSQL(CREATE_ARTIFACT_TABLE);
 
-        // create messages table
+        // Create messages table.
         db.execSQL(CREATE_MESSAGE_TABLE);
 
-        // create conversations table
+        // Create conversations table.
         db.execSQL(CREATE_CONVERSATIONS_TABLE);
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // on upgrade drop older tables
+        // On upgrade drop older tables.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ARTIFACTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONVERSATIONS);
 
-        // create new tables
+        // Create new tables.
         onCreate(db);
     }
 
-    /*
-     * Creating an Artifact
-    */
     public void addArtifact(Artifact artifact) {
         SQLiteDatabase db = this.getWritableDatabase();
 

@@ -22,8 +22,6 @@ import java.util.HashMap;
 import io.reactivex.Observable;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactCache;
-import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
@@ -42,8 +40,6 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                           ArrayList<Pair<Artifact, Float>> contents) {
 
         super(activity, R.layout.list_item, contents);
-        contents.add(new Pair<>(ArtifactCache.getInstance().get(0L), 200f));
-        contents.add(new Pair<>(ArtifactCache.getInstance().get(123L), 300f));
 
         this.contents = contents;
         positions = new HashMap<>();
@@ -159,16 +155,11 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                 ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
                 Bitmap image = BitmapFactory.decodeStream(imageStream);
                 imageView.setImageBitmap(image);
-
-            }else{
-                  imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
-                  artifact.setPicture(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
-              }
-
-            //temporary fix for now
-              DatabaseHelper dbhelper = new DatabaseHelper(this.getContext());
-              dbhelper.addArtifact(artifact);
-
+            } else {
+                // Otherwise, fall back on the launcher icon.
+                imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
+                        R.mipmap.ic_launcher));
+            }
         }
         // TODO: Reformat as resource string.
         distanceView.setText(String.valueOf(distance) + "m");

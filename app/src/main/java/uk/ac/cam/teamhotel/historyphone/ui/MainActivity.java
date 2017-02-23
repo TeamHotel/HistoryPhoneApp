@@ -16,6 +16,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
 
-    private DatabaseHelper dbhelper;
+    private DatabaseHelper databaseHelper;
+    private ArtifactLoader artifactLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +42,12 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.TabLayout);
 
         // Create the database helper.
-        dbhelper = new DatabaseHelper(this);
-        dbhelper.clearConversations();
-        dbhelper.clearMessages();
+        databaseHelper = new DatabaseHelper(this);
+        databaseHelper.clearConversations();
+        databaseHelper.clearMessages();
+
+        // Create the artifact loader.
+        artifactLoader = new ArtifactLoader(databaseHelper);
 
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
@@ -82,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * @return a reference to the artifact loader object.
+     */
+    public ArtifactLoader getArtifactLoader() { return artifactLoader; }
+
+    /**
      * Adapter class which provides fragments for the main tabbed layout.
      */
     private class TabAdapter extends FragmentPagerAdapter {
@@ -108,6 +118,5 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) { return titles[position]; }
-
     }
 }
