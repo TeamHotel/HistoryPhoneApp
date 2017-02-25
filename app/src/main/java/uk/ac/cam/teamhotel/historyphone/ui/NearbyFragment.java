@@ -148,6 +148,10 @@ public class NearbyFragment extends Fragment {
         // Inflate a new view with the nearby fragment layout.
         View rootView = inflater.inflate(R.layout.fragment_nearby, container, false);
 
+        // Get the artifact loader from the parent activity.
+        ArtifactLoader artifactLoader = ((MainActivity) getActivity()).getArtifactLoader();
+        artifactLoader.load(123L);
+
         // Set up the click listener for the list view.
         final ListView listView = (ListView) rootView.findViewById(R.id.nearby_list);
         listView.setOnItemClickListener((parent, rowView, position, id) -> {
@@ -172,6 +176,8 @@ public class NearbyFragment extends Fragment {
         // Create the beacon scanning pipeline and set the list
         // adapter to track the entries stream.
         createPipeline();
+
+
         listView.setAdapter(new NearbyAdapter(getActivity(), entriesStream));
 
         return rootView;

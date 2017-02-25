@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         databaseHelper.clearConversations();
         databaseHelper.clearMessages();
+        databaseHelper.clearArtifacts();
 
         // Create the artifact loader.
         artifactLoader = new ArtifactLoader(databaseHelper);

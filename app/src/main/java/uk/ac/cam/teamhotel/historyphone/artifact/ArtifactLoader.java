@@ -70,6 +70,8 @@ public class ArtifactLoader {
             // Store the newly retrieved artifact in the database.
             databaseHelper.addArtifact(artifact);
 
+            //TODO: Remove placeholder Artifact, refresh view to show when Artifact has loaded.
+            
             super.onPostExecute(artifact);
         }
     }

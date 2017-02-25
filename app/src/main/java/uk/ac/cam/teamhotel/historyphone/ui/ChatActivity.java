@@ -42,8 +42,10 @@ public class ChatActivity extends AppCompatActivity {
         // Load in messages from database
         loadChatListFromDB();
 
-        // Send 'init' message and server will reply with object greeting
-        new MessageAsyncTask().execute(new MessageContainer("init", uuid));
+        // Send 'init' message and server will reply with object greeting (only if chat enabled).
+        if(ENABLE_CHAT == true) {
+            new MessageAsyncTask().execute(new MessageContainer("init", uuid));
+        }
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(getApplicationContext(),chatMessageList );

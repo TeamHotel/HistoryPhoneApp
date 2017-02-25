@@ -225,6 +225,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Method to delete all Artifact records.
+     */
+    public void clearArtifacts(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM artifacts");
+    }
+
+
+    /**
      * Method to return all messages from the messages table, associated with a particular uuid/Artifact.
      * Used for displaying conversations in the ChatActivity view.
      */
