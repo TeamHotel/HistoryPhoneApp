@@ -1,5 +1,6 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -40,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
         loadChatListFromDB();
 
         //send 'init' message and server will reply with object greeting
-       // new MessageAsyncTask().execute(new MessageContainer("init", uuid));
+        new MessageAsyncTask().execute(new MessageContainer("init", uuid));
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(getApplicationContext(),chatMessageList );
@@ -65,29 +66,18 @@ public class ChatActivity extends AppCompatActivity {
         //add message to local db messages table
         dbHelper.addMessage(newMessage );
 
-        //if this is the first message for the conversation, update the recent tab's listview
-        if(chatMessageList.size() < 1){
-
-            // find recent fragment
-            RecentFragment frag = (RecentFragment) getSupportFragmentManager().findFragmentByTag("RecentFragment");
-
-            if(frag != null) {
-                // update the list view
-                frag.updateListView();
-            }
-        }
-
         //add or update the conversations table with the most recent timestamp for the current Artifact
         dbHelper.addToOrUpdateConversations(newMessage);
 
         chatMessageList.add(newMessage);
+
         //reset the text view to empty
         editText.setText("");
 
         dbHelper.printConversations();
 
         //Send message to server and receive reply.
-       // new MessageAsyncTask().execute(new MessageContainer(message, uuid));
+        new MessageAsyncTask().execute(new MessageContainer(message, uuid));
     }
 
     /**
@@ -98,7 +88,6 @@ public class ChatActivity extends AppCompatActivity {
         chatMessageList = dbHelper.returnAllMessages(uuid);
 
     }
-
 
     /**
      * This is used to send messages and receive responses - it assumes that messages have already been saved.

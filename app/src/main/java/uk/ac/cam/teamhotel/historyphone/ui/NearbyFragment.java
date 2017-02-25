@@ -165,6 +165,7 @@ public class NearbyFragment extends Fragment {
             intent.putExtra("ARTIFACT_TITLE", entry.first.getName());
             intent.putExtra("UUID", entry.first.getUUID());
 
+
             startActivity(intent);
         });
 
@@ -175,4 +176,5 @@ public class NearbyFragment extends Fragment {
 
         return rootView;
     }
+
 }
