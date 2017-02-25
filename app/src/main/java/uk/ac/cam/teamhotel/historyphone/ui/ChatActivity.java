@@ -33,16 +33,16 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        //get artifact uuid passed from previous fragment view
+        // Get artifact uuid passed from previous fragment view
         uuid = getIntent().getLongExtra("UUID",0L);
         ENABLE_CHAT = getIntent().getBooleanExtra("ENABLE_CHAT", false);
 
-        //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
+        // This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
         dbHelper = new DatabaseHelper(this);
-        //load in messages from database
+        // Load in messages from database
         loadChatListFromDB();
 
-        //send 'init' message and server will reply with object greeting
+        // Send 'init' message and server will reply with object greeting
         new MessageAsyncTask().execute(new MessageContainer("init", uuid));
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
@@ -50,11 +50,12 @@ public class ChatActivity extends AppCompatActivity {
         chatMessages.setAdapter(adapter);
 
 
-        //get the text field view
+        // Get the text field view
         EditText editText = (EditText) findViewById(R.id.enterText);
-        //get the send button
+        // Get the send button
         Button send_btn = (Button) findViewById(R.id.btn_Send);
 
+        // If fired from the recent tab, then we don't want the user to be able to chat.
         if(ENABLE_CHAT == false) {
             editText.setEnabled(false);
             send_btn.setEnabled(false);
@@ -67,10 +68,10 @@ public class ChatActivity extends AppCompatActivity {
      * Called when the user taps the send button.
      */
     public void sendMessage(View view) {
-        //get the text field view
+        // Get the text field view
         EditText editText = (EditText) findViewById(R.id.enterText);
 
-            //setup new ChatMessage object to store in db
+            // Setup new ChatMessage object to store in db
             String message = editText.getText().toString();
             ChatMessage newMessage = new ChatMessage();
             newMessage.setMessage_text(message);
@@ -78,20 +79,20 @@ public class ChatActivity extends AppCompatActivity {
             newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
             newMessage.setUuid(uuid);
 
-            //add message to local db messages table
+            // Add message to local db messages table
             dbHelper.addMessage(newMessage);
 
-            //add or update the conversations table with the most recent timestamp for the current Artifact
+            // Add or update the conversations table with the most recent timestamp for the current Artifact
             dbHelper.addToOrUpdateConversations(newMessage);
 
             chatMessageList.add(newMessage);
 
-            //reset the text view to empty
+            // Reset the text view to empty
             editText.setText("");
 
             dbHelper.printConversations();
 
-            //Send message to server and receive reply.
+            // Send message to server and receive reply.
             new MessageAsyncTask().execute(new MessageContainer(message, uuid));
 
     }
@@ -112,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(MessageContainer... params) {
-            //invoke static method to download artifact with uuid 123.
+            // Invoke static method to download artifact with uuid 123.
             String message = params[0].getMessage();
             long uuid = params[0].getUuid();
             return MessageSender.sendMessage(message, uuid);
@@ -128,9 +129,10 @@ public class ChatActivity extends AppCompatActivity {
 
                 dbHelper.addMessage(newMessage );
                 chatMessageList.add(newMessage);
-                //update list of items displayed
+                // Update list of items displayed
                 adapter.notifyDataSetChanged();
-            } else { //no response received - i.e. no connection to server or error with response
+            } else {
+                // No response received - i.e. no connection to server or error with response
                 Snackbar.make(findViewById(R.id.chat_list), "You have lost connection", Snackbar.LENGTH_LONG).show();
             }
             super.onPostExecute(reply);

@@ -57,6 +57,7 @@ public class RecentFragment extends Fragment{
             }
             Log.d(TAG, entry.first.toString());
 
+            // Tell the chat view that we want chatting disabled and also send the UUID
             intent.putExtra("ENABLE_CHAT", false);
             intent.putExtra("UUID", entry.first);
 

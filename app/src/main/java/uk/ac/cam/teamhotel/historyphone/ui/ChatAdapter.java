@@ -25,7 +25,7 @@ import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 public class ChatAdapter extends ArrayAdapter<ChatMessage> {
 
     public ChatAdapter(Context context, List<ChatMessage> messages) {
-        // resource ID = 0 as custom Adapter already handles this
+        // Resource ID = 0 as custom Adapter already handles this
         super(context, 0, messages);
     }
 
@@ -35,7 +35,7 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         // Get the data item for this position.
         ChatMessage chatMessage = getItem(position);
 
-        //get the type of the layout
+        // Get the type of the layout
         int type = getItemViewType(position);
 
         // Check if an existing view is being reused, otherwise inflate the view.
@@ -58,10 +58,8 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
             message_text.setText(chatMessage.getMessage_text());
             timestamp.setText(TimeStampHelper.formatTimeStamp(chatMessage.getTimestamp()));
             if(type ==0){
-                //id_image.setImageBitmap(appCache.get(chatMessage.getUuid()).getPicture());
                 id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
             }else{
-                //user image - ic_launcher for now
                 //TODO: add a different user image maybe
                 id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
             }
@@ -72,23 +70,19 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         return view;
     }
 
-    public void myFancyMethod(View v) {
-
-    }
-
-    //Override this method so that we can have two custom list_item_nearby layout files
+    // Override this method so that we can have two custom list_item_nearby layout files
     @Override
     public int getViewTypeCount() {
         return 2;
     }
 
-    //Override this method so that we can have two custom list_item_nearby layout files
+    // Override this method so that we can have two custom list_item_nearby layout files
     @Override
     public int getItemViewType(int position) {
-        //get corresponding data item
+        // Get corresponding data item
         ChatMessage chatMessage = getItem(position);
 
-        //return the type of the layout, depending on whether the message is a sent or received.
+        // Return the type of the layout, depending on whether the message is a sent or received.
         if(chatMessage.isFrom_user() == 0){
             return 0;
         }else{
