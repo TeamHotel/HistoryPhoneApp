@@ -162,7 +162,7 @@ public class NearbyFragment extends Fragment {
                 return;
             }
             Log.d(TAG, entry.first.toString());
-            intent.putExtra("ARTIFACT_TITLE", entry.first.getName());
+            intent.putExtra("ENABLE_CHAT", true);
             intent.putExtra("UUID", entry.first.getUUID());
 
 

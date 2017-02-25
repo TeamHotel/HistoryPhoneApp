@@ -41,7 +41,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
     private NearbyAdapter(Activity activity, Observable<Pair<Artifact, Float>> entryStream,
                           ArrayList<Pair<Artifact, Float>> contents) {
 
-        super(activity, R.layout.list_item, contents);
+        super(activity, R.layout.list_item_nearby, contents);
 
         ArtifactLoader loader = new ArtifactLoader(new DatabaseHelper(getContext()));
         contents.add(new Pair<>(loader.load(0L), 200f));
@@ -135,7 +135,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
         // Check if an existing view is being reused, otherwise inflate the view.
         if (view == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
+            view = LayoutInflater.from(getContext()).inflate(R.layout.list_item_nearby, parent, false);
         }
 
         // Lookup view for data population.

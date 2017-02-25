@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -21,7 +22,7 @@ import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static String ARTIFACT_NAME = "null";
+    private static boolean ENABLE_CHAT = false;
     private static long uuid;
     private DatabaseHelper dbHelper;
     private ChatAdapter adapter;
@@ -34,6 +35,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //get artifact uuid passed from previous fragment view
         uuid = getIntent().getLongExtra("UUID",0L);
+        ENABLE_CHAT = getIntent().getBooleanExtra("ENABLE_CHAT", false);
 
         //This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
         dbHelper = new DatabaseHelper(this);
@@ -46,6 +48,19 @@ public class ChatActivity extends AppCompatActivity {
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(getApplicationContext(),chatMessageList );
         chatMessages.setAdapter(adapter);
+
+
+        //get the text field view
+        EditText editText = (EditText) findViewById(R.id.enterText);
+        //get the send button
+        Button send_btn = (Button) findViewById(R.id.btn_Send);
+
+        if(ENABLE_CHAT == false) {
+            editText.setEnabled(false);
+            send_btn.setEnabled(false);
+        }
+
+
     }
 
     /**
@@ -55,29 +70,30 @@ public class ChatActivity extends AppCompatActivity {
         //get the text field view
         EditText editText = (EditText) findViewById(R.id.enterText);
 
-        //setup new ChatMessage object to store in db
-        String message = editText.getText().toString();
-        ChatMessage newMessage = new ChatMessage();
-        newMessage.setMessage_text(message);
-        newMessage.setFrom_user(true);
-        newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
-        newMessage.setUuid(uuid);
+            //setup new ChatMessage object to store in db
+            String message = editText.getText().toString();
+            ChatMessage newMessage = new ChatMessage();
+            newMessage.setMessage_text(message);
+            newMessage.setFrom_user(true);
+            newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
+            newMessage.setUuid(uuid);
 
-        //add message to local db messages table
-        dbHelper.addMessage(newMessage );
+            //add message to local db messages table
+            dbHelper.addMessage(newMessage);
 
-        //add or update the conversations table with the most recent timestamp for the current Artifact
-        dbHelper.addToOrUpdateConversations(newMessage);
+            //add or update the conversations table with the most recent timestamp for the current Artifact
+            dbHelper.addToOrUpdateConversations(newMessage);
 
-        chatMessageList.add(newMessage);
+            chatMessageList.add(newMessage);
 
-        //reset the text view to empty
-        editText.setText("");
+            //reset the text view to empty
+            editText.setText("");
 
-        dbHelper.printConversations();
+            dbHelper.printConversations();
 
-        //Send message to server and receive reply.
-        new MessageAsyncTask().execute(new MessageContainer(message, uuid));
+            //Send message to server and receive reply.
+            new MessageAsyncTask().execute(new MessageContainer(message, uuid));
+
     }
 
     /**

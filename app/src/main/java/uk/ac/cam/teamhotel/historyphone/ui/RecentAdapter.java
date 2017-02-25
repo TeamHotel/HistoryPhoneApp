@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +26,7 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
     public static final String TAG = "RecentAdapter";
 
     public RecentAdapter(Context context, List<Pair<Long, String>> objects) {
-        super(context, R.layout.list_item, objects);
+        super(context, R.layout.list_item_nearby, objects);
     }
 
     @NonNull
@@ -37,7 +36,7 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
 
         // Check if an existing view is being reused, otherwise inflate the view.
         if (view == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
+            view = LayoutInflater.from(getContext()).inflate(R.layout.list_item_recent, parent, false);
         }
 
         // No entries should be null.
@@ -54,10 +53,12 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
         TextView titleView = (TextView) view.findViewById(R.id.artifact_title);
         TextView descriptionView = (TextView) view.findViewById(R.id.artifact_description);
         ImageView imageView = (ImageView) view.findViewById(R.id.artifact_image);
+        TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
 
         // Populate the data into the template view using the artifact object.
         titleView.setText(artifact.getName());
         descriptionView.setText(artifact.getDescription());
+        timestamp.setText(entry.second);
 
         // Format artifact image.
         if (artifact.getPicture() != null) {

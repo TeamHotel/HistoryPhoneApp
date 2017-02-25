@@ -56,7 +56,8 @@ public class RecentFragment extends Fragment{
                 return;
             }
             Log.d(TAG, entry.first.toString());
-            //intent.putExtra("ARTIFACT_TITLE", entry.first.getName());
+
+            intent.putExtra("ENABLE_CHAT", false);
             intent.putExtra("UUID", entry.first);
 
             startActivity(intent);

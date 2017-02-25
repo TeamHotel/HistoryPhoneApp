@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -51,7 +52,6 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         TextView message_text = (TextView) view.findViewById(R.id.chat_message);
         TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
 
-
         // Populate the data into the template view using the data object.
         {
             // Set parameters of artifact tile.
@@ -72,13 +72,17 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         return view;
     }
 
-    //Override this method so that we can have two custom list_item layout files
+    public void myFancyMethod(View v) {
+
+    }
+
+    //Override this method so that we can have two custom list_item_nearby layout files
     @Override
     public int getViewTypeCount() {
         return 2;
     }
 
-    //Override this method so that we can have two custom list_item layout files
+    //Override this method so that we can have two custom list_item_nearby layout files
     @Override
     public int getItemViewType(int position) {
         //get corresponding data item
