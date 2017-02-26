@@ -165,6 +165,12 @@ public class NearbyFragment extends Fragment {
                 Log.d(TAG, "NULL ARTIFACT");
                 return;
             }
+
+            // Check if the item is a Loader tile, if so, we do not want a chat session to open on click.
+            if(entry.first.getUUID() == -1L){
+                Log.d(TAG, "LOADER ARTIFACT");
+                return;
+            }
             Log.d(TAG, entry.first.toString());
             intent.putExtra("ENABLE_CHAT", true);
             intent.putExtra("UUID", entry.first.getUUID());
