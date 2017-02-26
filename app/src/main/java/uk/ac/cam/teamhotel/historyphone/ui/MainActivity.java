@@ -16,6 +16,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper.clearConversations();
         databaseHelper.clearMessages();
         databaseHelper.clearArtifacts();
+        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
 
         // Create the artifact loader.
         artifactLoader = new ArtifactLoader(databaseHelper);

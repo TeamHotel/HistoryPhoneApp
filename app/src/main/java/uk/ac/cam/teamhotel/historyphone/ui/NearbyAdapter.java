@@ -47,6 +47,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
         contents.add(new Pair<>(loader.load(0L), 200f));
         contents.add(new Pair<>(loader.load(123L), 300f));
 
+
         this.contents = contents;
         positions = new HashMap<>();
 

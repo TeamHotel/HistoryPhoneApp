@@ -100,7 +100,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("uuid", artifact.getUUID());
         values.put("title", artifact.getName() );
         values.put("description", artifact.getDescription());
-        values.put("image", getBitmapAsByteArray(artifact.getPicture()));
+        if(artifact.getPicture() != null){
+            values.put("image", getBitmapAsByteArray(artifact.getPicture()));
+        }
 
         // insert row
         db.insert(TABLE_ARTIFACTS, null , values);
@@ -118,7 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Artifact artifact = null;
         String title;
         String description;
-        Bitmap picture;
+        Bitmap picture = null;
 
         String get_artifact_query = "SELECT * FROM artifacts WHERE uuid="+uuid;
         final Cursor cursor = db.rawQuery(get_artifact_query, null);
@@ -129,9 +131,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 if (cursor.moveToFirst()) {
                     title = cursor.getString(2);
                     description = cursor.getString(3);
-                    byte[] byteArray = cursor.getBlob(4);
-                    picture = BitmapFactory.decodeByteArray(byteArray, 0,byteArray.length );
-
+                    if(!cursor.isNull(4)) {
+                        byte[] byteArray = cursor.getBlob(4);
+                        picture = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                    }
                     artifact = new Artifact(uuid, title, description, picture);
 
                 }
@@ -191,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    //debug purposes
+    //TODO: delete this debug function on app complete
     public void printConversations(){
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -222,6 +225,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void clearMessages(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM messages");
+    }
+
+    //TODO: delete this debug function on app complete
+    public void printMessages(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM messages";
+        Cursor cursor = db.rawQuery(sqlQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d("Messages", cursor.getString(1) + " : " + cursor.getString(2) );
+
+            } while (cursor.moveToNext());
+        }
+
+    }
+    //TODO: delete this debug function on app complete
+    public void printArtifacts(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM artifacts";
+        Cursor cursor = db.rawQuery(sqlQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d("Artifacts", cursor.getString(0) + " : " + cursor.getString(1) );
+
+            } while (cursor.moveToNext());
+        }
     }
 
     /**

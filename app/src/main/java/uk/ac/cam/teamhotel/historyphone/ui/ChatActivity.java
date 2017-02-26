@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -62,7 +63,7 @@ public class ChatActivity extends AppCompatActivity {
             editText.setEnabled(false);
             send_btn.setEnabled(false);
         }
-
+        
 
     }
 
@@ -91,8 +92,6 @@ public class ChatActivity extends AppCompatActivity {
 
             // Reset the text view to empty
             editText.setText("");
-
-            dbHelper.printConversations();
 
             // Send message to server and receive reply.
             new MessageAsyncTask().execute(new MessageContainer(message, uuid));
