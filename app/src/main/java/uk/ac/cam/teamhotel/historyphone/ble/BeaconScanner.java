@@ -6,6 +6,8 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.util.Log;
 
+import java.util.LinkedList;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -28,7 +30,7 @@ public class BeaconScanner {
 
     private boolean scanning;
     private Observable<Beacon> beaconStream;
-    private ObservableEmitter<Beacon> beaconEmitter;
+    private LinkedList<ObservableEmitter<Beacon>> beaconEmitters;
     private BluetoothAdapter adapter;
 
     /**
@@ -37,10 +39,11 @@ public class BeaconScanner {
     private BeaconScanner() {
         Log.i(TAG, "Initialising beacon scanner.");
         scanning = false;
+        beaconEmitters = new LinkedList<>();
         beaconStream = Observable.create(new ObservableOnSubscribe<Beacon>() {
             @Override
             public void subscribe(ObservableEmitter<Beacon> emitter) throws Exception {
-                beaconEmitter = emitter;
+                beaconEmitters.push(emitter);
             }
         });
         adapter = BluetoothAdapter.getDefaultAdapter();
@@ -72,7 +75,9 @@ public class BeaconScanner {
 
             Beacon beacon = new Beacon(uuid, dist);
             Log.d(TAG, "Scanned beacon: " + beacon.toString());
-            beaconEmitter.onNext(beacon);
+            for (ObservableEmitter<Beacon> beaconEmitter : beaconEmitters) {
+                beaconEmitter.onNext(beacon);
+            }
         }
 
         @Override
