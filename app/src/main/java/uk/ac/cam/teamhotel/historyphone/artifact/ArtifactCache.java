@@ -1,5 +1,6 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
+import android.util.Log;
 import android.util.LongSparseArray;
 
 /**
@@ -25,5 +26,8 @@ public class ArtifactCache {
 
     public void set(long uuid, Artifact artifact) {
         cache.put(uuid, artifact);
+        Log.d("Cache", "Added Artifact with uuid: " + uuid );
     }
+
+    public void delete(long uuid){cache.delete(uuid);}
 }

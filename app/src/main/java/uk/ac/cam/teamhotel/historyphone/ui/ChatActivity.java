@@ -37,6 +37,9 @@ public class ChatActivity extends AppCompatActivity {
         // Get artifact uuid passed from previous fragment view
         uuid = getIntent().getLongExtra("UUID",0L);
         ENABLE_CHAT = getIntent().getBooleanExtra("ENABLE_CHAT", false);
+        String str = getIntent().getStringExtra("NAME");
+        String desc = getIntent().getStringExtra("DESC");
+        Log.d("CHATACTIVITY_NAME", str +": " + uuid + " : " + desc);
 
         // This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
         dbHelper = new DatabaseHelper(this);
@@ -63,7 +66,9 @@ public class ChatActivity extends AppCompatActivity {
             editText.setEnabled(false);
             send_btn.setEnabled(false);
         }
-        
+
+        dbHelper.printArtifacts();
+        dbHelper.printMessages();
 
     }
 
@@ -127,6 +132,7 @@ public class ChatActivity extends AppCompatActivity {
                 newMessage.setMessage_text(reply);
                 newMessage.setFrom_user(false);
                 newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
+                newMessage.setUuid(uuid);
 
                 dbHelper.addMessage(newMessage );
                 chatMessageList.add(newMessage);

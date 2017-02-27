@@ -6,12 +6,13 @@ import android.util.Log;
 public class Artifact {
     private static final String TAG = "Artifact";
 
-    public static final Artifact LOADING = new Artifact(-1, "", "", null);
+   // public static final Artifact LOADING = new Artifact(-1, "", "", null);
 
     private long uuid;
     private String name;
     private String description;
     private Bitmap picture;
+    private long loading_uuid;
 
     public Artifact(long uuid, String name, String description, Bitmap picture) {
         this.uuid = uuid;
@@ -19,6 +20,11 @@ public class Artifact {
         this.name = name;
         this.description = description;
         this.picture = picture;
+    }
+
+    public Artifact(long uuid, long loading_uuid){
+        this.uuid = uuid;
+        this.loading_uuid = loading_uuid;
     }
 
     public long getUUID() { return uuid; }
@@ -33,5 +39,9 @@ public class Artifact {
     @Override
     public String toString() {
         return "Artifact(" + uuid + ", " + name + ")";
+    }
+
+    public long getLoading_uuid() {
+        return loading_uuid;
     }
 }

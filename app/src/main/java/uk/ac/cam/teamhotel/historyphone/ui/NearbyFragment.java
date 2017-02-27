@@ -148,9 +148,6 @@ public class NearbyFragment extends Fragment {
         // Inflate a new view with the nearby fragment layout.
         View rootView = inflater.inflate(R.layout.fragment_nearby, container, false);
 
-        // Get the artifact loader from the parent activity.
-        ArtifactLoader artifactLoader = ((MainActivity) getActivity()).getArtifactLoader();
-        artifactLoader.load(123L);
 
         // Set up the click listener for the list view.
         final ListView listView = (ListView) rootView.findViewById(R.id.nearby_list);
@@ -160,20 +157,33 @@ public class NearbyFragment extends Fragment {
             // Pass artifact name and UUID to chat session.
             Pair<Artifact, Float> entry =
                     ((NearbyAdapter) listView.getAdapter()).getItem(position);
+
             assert entry != null;
             if (entry.first == null) {
                 Log.d(TAG, "NULL ARTIFACT");
                 return;
             }
 
+            // Get the artifact loader from the parent activity.
+            ArtifactLoader artifactLoader = ((MainActivity) getActivity()).getArtifactLoader();
+
             // Check if the item is a Loader tile, if so, we do not want a chat session to open on click.
             if(entry.first.getUUID() == -1L){
                 Log.d(TAG, "LOADER ARTIFACT");
+
+                //TODO: move this outside click listener for instant refresh
+                ((NearbyAdapter) listView.getAdapter()).remove(entry);
+                Artifact loaded = artifactLoader.load(entry.first.getLoading_uuid());
+                ((NearbyAdapter) listView.getAdapter()).add(new Pair<>(loaded, entry.second));
+
                 return;
             }
             Log.d(TAG, entry.first.toString());
             intent.putExtra("ENABLE_CHAT", true);
             intent.putExtra("UUID", entry.first.getUUID());
+            intent.putExtra("NAME", entry.first.getName());
+            intent.putExtra("DESC", entry.first.getDescription());
+
 
 
             startActivity(intent);

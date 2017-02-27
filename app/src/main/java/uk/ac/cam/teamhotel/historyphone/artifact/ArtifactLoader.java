@@ -37,7 +37,8 @@ public class ArtifactLoader {
         // from the server and return the loading placeholder artifact.
         if (artifact == null) {
             retrieve(uuid);
-            return Artifact.LOADING;
+            //return Artifact.LOADING;
+            return new Artifact(-1, uuid);
         }
         return artifact;
     }
@@ -71,7 +72,7 @@ public class ArtifactLoader {
             databaseHelper.addArtifact(artifact);
 
             //TODO: Remove placeholder Artifact, refresh view to show when Artifact has loaded.
-            
+
             super.onPostExecute(artifact);
         }
     }
