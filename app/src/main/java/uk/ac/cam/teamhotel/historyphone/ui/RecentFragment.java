@@ -19,7 +19,7 @@ import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
-public class RecentFragment extends Fragment {
+public class RecentFragment extends Fragment{
 
     public static final String TAG = "RecentFragment";
     private List<Pair<Long, String>> conversationList = new ArrayList<Pair<Long, String>>();
@@ -56,51 +56,37 @@ public class RecentFragment extends Fragment {
                 return;
             }
             Log.d(TAG, entry.first.toString());
-            //intent.putExtra("ARTIFACT_TITLE", entry.first.getName());
+
+            // Tell the chat view that we want chatting disabled and also send the UUID
+            intent.putExtra("ENABLE_CHAT", false);
             intent.putExtra("UUID", entry.first);
 
-
-
             startActivity(intent);
+
         });
 
         return rootView;
 
     }
 
-    /*@Override
+    /**
+     * Method overridden to load in additions from the DB, re-attach the list adapter and then notify it of changes.
+     * This is called when the Tab is reselected by the user, allowing for dynamic refreshing.
+     */
+    @Override
     public void onResume() {
 
-        ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
         super.onResume();
-
-    }
-
-    @Override
-    public void setMenuVisibility(final boolean visible) {
-        super.setMenuVisibility(visible);
-        if (visible) {
-            updateListView();
-            ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
-        }
-    }*/
-
-    public void loadConversationsFromDB(){
-
-           conversationList = dbHelper.returnAllConversations();
-
-    }
-
-
-    public void updateListView() {
         loadConversationsFromDB();
+        listView.setAdapter(new RecentAdapter(getActivity(), conversationList));
+        ((RecentAdapter)listView.getAdapter()).notifyDataSetChanged();
 
-        // Reload current fragment
-        Fragment currentFragment = getFragmentManager().findFragmentByTag("RecentFragment");
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.detach(currentFragment);
-        fragmentTransaction.attach(currentFragment);
-        fragmentTransaction.commit();
+    }
 
+    /**
+     * Method to pull in changes from the DB and load the conversationsList member variable.
+     */
+    private void loadConversationsFromDB(){
+           conversationList = dbHelper.returnAllConversations();
     }
 }

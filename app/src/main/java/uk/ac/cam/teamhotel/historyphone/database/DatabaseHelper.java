@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
@@ -89,6 +90,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /**
+     * Method to add an Artifact to the artifacts table.
+     */
     public void addArtifact(Artifact artifact) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -96,7 +100,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("uuid", artifact.getUUID());
         values.put("title", artifact.getName() );
         values.put("description", artifact.getDescription());
-        values.put("image", getBitmapAsByteArray(artifact.getPicture()));
+        if(artifact.getPicture() != null){
+            values.put("image", getBitmapAsByteArray(artifact.getPicture()));
+        }
 
         // insert row
         db.insert(TABLE_ARTIFACTS, null , values);
@@ -104,6 +110,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Method to retrieve an Artifact from the artifacts table. Returns NULL object ref if unsuccessful.
+     */
+    public Artifact getArtifact(Long uuid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //default return artifact as null
+        Artifact artifact = null;
+        String title;
+        String description;
+        Bitmap picture = null;
+
+        String get_artifact_query = "SELECT * FROM artifacts WHERE uuid="+uuid;
+        final Cursor cursor = db.rawQuery(get_artifact_query, null);
+
+        //construct artifact object if the query is successful
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    title = cursor.getString(2);
+                    description = cursor.getString(3);
+                    if(!cursor.isNull(4)) {
+                        byte[] byteArray = cursor.getBlob(4);
+                        picture = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                    }
+                    artifact = new Artifact(uuid, title, description, picture);
+
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        return artifact;
+
+
+    }
+
+    /**
+     * Method to add a ChatMessage to the messages table.
+     */
     public void addMessage(ChatMessage chatMessage){
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -125,13 +172,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("artifact_id", id );
         values.put("message_text", chatMessage.getMessage_text());
         values.put("from_user", chatMessage.isFrom_user());
+        values.put("created_at", chatMessage.getTimestamp());
 
         // insert row
         db.insert(TABLE_MESSAGES, null , values);
         db.close();
     }
 
-    //add record to table if not exists else update record with latest timestamp
+
+    /**
+     * Method to add record to table if not exists else update record with latest timestamp.
+     */
     public void addToOrUpdateConversations(ChatMessage chatMessage){
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -143,11 +194,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    //debug purposes
+    //TODO: delete this debug function on app complete
     public void printConversations(){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sqlQuery = "SELECT * FROM conversations";
+        String sqlQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
         Cursor cursor = db.rawQuery(sqlQuery, null);
 
         if (cursor.moveToFirst()) {
@@ -159,19 +210,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    //method to delete all conversation records (for recent tab population)
+    /**
+     * Method to delete all conversation records (for recent tab population).
+     */
     public void clearConversations(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM conversations");
     }
 
-    //method to delete all message records
+
+    /**
+     * Method to delete all message records.
+     */
     public void clearMessages(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM messages");
     }
 
-    //TODO: add uuid filtering perhaps
+    //TODO: delete this debug function on app complete
+    public void printMessages(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM messages";
+        Cursor cursor = db.rawQuery(sqlQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d("Messages", cursor.getString(1) + " : " + cursor.getString(2) );
+
+            } while (cursor.moveToNext());
+        }
+
+    }
+    //TODO: delete this debug function on app complete
+    public void printArtifacts(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM artifacts";
+        Cursor cursor = db.rawQuery(sqlQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d("Artifacts", cursor.getString(0) + " : " + cursor.getString(1) );
+
+            } while (cursor.moveToNext());
+        }
+    }
+
+    /**
+     * Method to delete all Artifact records.
+     */
+    public void clearArtifacts(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM artifacts");
+    }
+
+
+    /**
+     * Method to return all messages from the messages table, associated with a particular uuid/Artifact.
+     * Used for displaying conversations in the ChatActivity view.
+     */
     public List<ChatMessage> returnAllMessages(Long uuid){
         List<ChatMessage> messageList = new ArrayList<ChatMessage>();
 
@@ -203,6 +301,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return messageList;
     }
 
+    /**
+     * Method to return all conversations from the conversations table, ordered by timestamp of the most recent message.
+     * This returns a list of pairs, corresponding to the uuid and the timestamp.
+     */
     public List<Pair<Long, String>> returnAllConversations(){
 
         List<Pair<Long, String>> entries = new ArrayList<Pair<Long, String>>();
@@ -226,7 +328,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return entries;
     }
 
-    //method for converting bitmap to byte array for storing in db
+    /**
+     * Method for converting bitmap to byte array for storing in the database.
+     */
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);

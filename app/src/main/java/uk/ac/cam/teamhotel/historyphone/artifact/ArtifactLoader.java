@@ -25,15 +25,20 @@ public class ArtifactLoader {
      */
     public Artifact load(Long uuid) {
         Artifact artifact = artifactCache.get(uuid);
+
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
-            // TODO: Request artifact from local database.
+
+            // Attempt to get Artifact from local database
+            artifact = databaseHelper.getArtifact(uuid);
+
         }
         // If the artifact metadata is not present in the db, concurrently retrieve it
         // from the server and return the loading placeholder artifact.
         if (artifact == null) {
             retrieve(uuid);
-            return Artifact.LOADING;
+            //return Artifact.LOADING;
+            return new Artifact(-1, uuid);
         }
         return artifact;
     }
@@ -64,6 +69,9 @@ public class ArtifactLoader {
             artifactCache.set(uuid, artifact);
 
             // Store the newly retrieved artifact in the database.
+            databaseHelper.addArtifact(artifact);
+
+            //TODO: Remove placeholder Artifact, refresh view to show when Artifact has loaded.
 
             super.onPostExecute(artifact);
         }

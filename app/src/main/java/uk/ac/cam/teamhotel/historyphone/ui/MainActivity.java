@@ -16,6 +16,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         databaseHelper.clearConversations();
         databaseHelper.clearMessages();
+        databaseHelper.clearArtifacts();
+        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
 
         // Create the artifact loader.
         artifactLoader = new ArtifactLoader(databaseHelper);
@@ -52,11 +55,11 @@ public class MainActivity extends AppCompatActivity {
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
-        viewPager.setOffscreenPageLimit(2);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+
             }
 
             @Override
@@ -67,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+
+                // If the Recent Tab is reselected, get a reference to it and call onResume, which will update the view.
+                if(tab.getPosition() == 1){
+                    ((RecentFragment)((TabAdapter) (viewPager.getAdapter())).getItem(1)).onResume();
+                }
             }
         });
 
@@ -85,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG, "Activity created.");
     }
+
 
     /**
      * @return a reference to the artifact loader object.
