@@ -44,8 +44,8 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
         super(activity, R.layout.list_item_nearby, contents);
 
         ArtifactLoader loader = new ArtifactLoader(new DatabaseHelper(getContext()));
-        contents.add(new Pair<>(loader.load(0L), 200f));
-        contents.add(new Pair<>(loader.load(123L), 300f));
+        contents.add(new Pair<>(loader.load(0L), 120.0f));
+        contents.add(new Pair<>(loader.load(123L), 180.0f));
 
         this.contents = contents;
         positions = new HashMap<>();
@@ -80,7 +80,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             remove(artifact);
         }
 
-        // Insert, maintaining the contents' order by distance.
+        // Insert, maintaining the contents' ordering by distance.
         int position = -1 - Collections.binarySearch(contents, new Pair<>(null, distance),
                 (left, right) -> {
                     int distanceComparison = left.second.compareTo(right.second);
@@ -90,7 +90,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                 });
         if (contents.size() > 0) {
             contents.add(contents.get(contents.size() - 1));
-            for (int i = contents.size() - 1; i >= position + 1; i--) {
+            for (int i = contents.size() - 2; i >= position; i--) {
                 contents.set(i + 1, contents.get(i));
             }
             contents.set(position, new Pair<>(artifact, distance));
