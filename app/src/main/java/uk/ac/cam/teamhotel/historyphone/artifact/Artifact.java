@@ -4,44 +4,44 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 public class Artifact {
+
     private static final String TAG = "Artifact";
 
-   // public static final Artifact LOADING = new Artifact(-1, "", "", null);
+    /**
+     * Instantiate a new placeholder artifact with a particular uuid. Placeholder
+     * artifacts the uuid of an actual artifact, and therefore time out with them,
+     * but may be used to display loading tiles where the artifact data has not
+     * been retrieved from the server.
+     *
+     * @return a newly instantiated placeholder artifact.
+     */
+    public static Artifact newPlaceholder(long uuid) {
+        return new Artifact(-uuid - 1, null, null, null);
+    }
 
     private long uuid;
     private String name;
     private String description;
     private Bitmap picture;
-    private long loading_uuid;
 
     public Artifact(long uuid, String name, String description, Bitmap picture) {
+        Log.d(TAG, "Created artifact with uuid: " + uuid);
         this.uuid = uuid;
-        Log.d(TAG, "Artifact: Created artifact with uuid :" + uuid);
         this.name = name;
         this.description = description;
         this.picture = picture;
     }
 
-    public Artifact(long uuid, long loading_uuid){
-        this.uuid = uuid;
-        this.loading_uuid = loading_uuid;
+    public long getUUID() {
+        return (isPlaceholder()) ? -uuid - 1 : uuid;
     }
-
-    public long getUUID() { return uuid; }
     public String getName() { return name; }
     public String getDescription() { return description; }
     public Bitmap getPicture() { return picture; }
-
-    public void setName(String name){this.name = name;}
-    public void setDescription(String desc){this.description = desc;}
-    public void setPicture(Bitmap pic){this.picture = pic;}
+    public boolean isPlaceholder() { return uuid < 0; }
 
     @Override
     public String toString() {
         return "Artifact(" + uuid + ", " + name + ")";
-    }
-
-    public long getLoading_uuid() {
-        return loading_uuid;
     }
 }
