@@ -31,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
 
-    private DatabaseHelper databaseHelper;
-    private ArtifactLoader artifactLoader;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,16 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.ViewPager);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.TabLayout);
-
-        // Create the database helper.
-        databaseHelper = new DatabaseHelper(this);
-        databaseHelper.clearConversations();
-        databaseHelper.clearMessages();
-        databaseHelper.clearArtifacts();
-        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo"));
-
-        // Create the artifact loader.
-        artifactLoader = new ArtifactLoader(databaseHelper);
 
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
@@ -93,12 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG, "Activity created.");
     }
-
-
-    /**
-     * @return a reference to the artifact loader object.
-     */
-    public ArtifactLoader getArtifactLoader() { return artifactLoader; }
 
     /**
      * Adapter class which provides fragments for the main tabbed layout.

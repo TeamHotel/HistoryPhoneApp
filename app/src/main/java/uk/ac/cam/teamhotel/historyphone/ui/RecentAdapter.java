@@ -1,5 +1,6 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
@@ -47,7 +49,9 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
         }
 
         // Get the current artifact by using the uuid to pull from cache.
-        ArtifactLoader artifactLoader = ((MainActivity) getContext()).getArtifactLoader();
+        Activity activity = (Activity) getContext();
+        ArtifactLoader artifactLoader =
+                ((HistoryPhoneApplication) activity.getApplication()).getArtifactLoader();
         Artifact artifact = artifactLoader.load(entry.first);
 
         // Lookup view for data population.

@@ -50,7 +50,8 @@ public class BeaconScanner {
     }
 
     /**
-     * Scan callback object used to emit beacons on the beacon stream.
+     * ScanCallback object used to emit beacons on the beacon stream when
+     * BLE scans are received from the operating system.
      */
     private final ScanCallback scanCallback = new ScanCallback() {
         @Override
