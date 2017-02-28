@@ -16,7 +16,7 @@ public class HistoryPhoneApplication extends Application {
         databaseHelper = new DatabaseHelper(this);
 
         // Create the artifact loader.
-        artifactLoader = new ArtifactLoader(databaseHelper);
+        artifactLoader = new ArtifactLoader(databaseHelper, this);
     }
 
     /**

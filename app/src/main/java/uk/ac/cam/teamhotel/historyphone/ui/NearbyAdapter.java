@@ -20,8 +20,11 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import io.reactivex.Observable;
+import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
+import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
+import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 
 public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
@@ -40,6 +43,10 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                           ArrayList<Pair<Artifact, Float>> contents) {
 
         super(activity, R.layout.list_item_nearby, contents);
+
+        ArtifactLoader artifactLoader = ((HistoryPhoneApplication) getContext().getApplicationContext()).getArtifactLoader();
+        contents.add(new Pair<>(artifactLoader.load(0L), 120.0f));
+        contents.add(new Pair<>(artifactLoader.load(123L), 180.0f));
 
         this.contents = contents;
         positions = new HashMap<>();
@@ -149,17 +156,15 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             descriptionView.setText(artifact.getDescription());
 
             // Format artifact image.
-            if (artifact.getPicture() != null) {
-                // If there is an image associated with the artifact, display it.
-                byte[] outImage = getBitmapAsByteArray(artifact.getPicture());
-                ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
-                Bitmap image = BitmapFactory.decodeStream(imageStream);
+            Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(), getContext().getApplicationContext());
+            if(image != null) {
                 imageView.setImageBitmap(image);
-            } else {
+            }else {
                 // Otherwise, fall back on the launcher icon.
                 imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
                         R.mipmap.ic_launcher));
             }
+
         }
         distanceView.setText(String.format(getContext().getString(R.string.distance), distance));
 

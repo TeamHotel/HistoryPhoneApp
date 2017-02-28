@@ -16,6 +16,7 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
+import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 
 public class ChatAdapter extends ArrayAdapter<ChatMessage> {
@@ -54,7 +55,17 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
             message_text.setText(chatMessage.getMessage_text());
             timestamp.setText(TimeStampHelper.formatTimeStamp(chatMessage.getTimestamp()));
             if(type ==0){
-                id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));
+
+                // Format artifact image.
+                Bitmap image = StoreBitmapUtility.loadImageFromStorage(chatMessage.getUuid(), getContext().getApplicationContext());
+                if(image != null) {
+                    id_image.setImageBitmap(image);
+                }else {
+                    // Otherwise, fall back on the launcher icon.
+                    id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
+                            R.mipmap.ic_launcher));
+                }
+
             }else{
                 //TODO: add a different user image maybe
                 id_image.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.ic_launcher));

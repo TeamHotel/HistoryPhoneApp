@@ -29,7 +29,6 @@ public class Artifact {
         this.uuid = uuid;
         this.name = name;
         this.description = description;
-        this.picture = picture;
     }
 
     public long getUUID() {
@@ -37,11 +36,14 @@ public class Artifact {
     }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public Bitmap getPicture() { return picture; }
     public boolean isPlaceholder() { return uuid < 0; }
 
     @Override
     public String toString() {
         return "Artifact(" + uuid + ", " + name + ")";
+    }
+
+    public Bitmap getPicture() {
+        return picture;
     }
 }
