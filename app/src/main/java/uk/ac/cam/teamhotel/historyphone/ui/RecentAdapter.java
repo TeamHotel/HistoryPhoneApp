@@ -20,6 +20,7 @@ import java.util.List;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
+import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 
 public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
 
@@ -61,12 +62,11 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
         timestamp.setText(entry.second);
 
         // Format artifact image.
-        if (artifact.getPicture() != null) {
-            byte[] outImage = getBitmapAsByteArray(artifact.getPicture());
-            ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
-            Bitmap image = BitmapFactory.decodeStream(imageStream);
+        Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(), getContext().getApplicationContext());
+        if(image != null) {
             imageView.setImageBitmap(image);
-        } else{
+        }else {
+            // Otherwise, fall back on the launcher icon.
             imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
                     R.mipmap.ic_launcher));
         }

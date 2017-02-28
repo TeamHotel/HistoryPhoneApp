@@ -18,6 +18,7 @@ public class ArtifactLoader {
         artifactCache = new ArtifactCache();
     }
 
+
     /**
      * Load a single Artifact object from the cache. If the Artifact is not present
      * in the cache, it is loaded from the database. If the Artifact is not present

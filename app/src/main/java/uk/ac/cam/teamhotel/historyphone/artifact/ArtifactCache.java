@@ -15,9 +15,9 @@ public class ArtifactCache {
     public ArtifactCache() {
         cache = new LongSparseArray<>();
         // TODO: Remove once artifact loading from server works.
-        cache.put(0L, new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
+        cache.put(0L, new Artifact(0L, "Thing1", "Some friccin type of thingo"));
         //cache.put(123L, new Artifact(123L, "Thing2", "Some friccin type of thingo", null));
-        cache.put(56L, new Artifact(56L, "Thing3", "Some friccin type of thingo", null));
+        cache.put(56L, new Artifact(56L, "Thing3", "Some friccin type of thingo"));
     }
 
     public Artifact get(long uuid) {

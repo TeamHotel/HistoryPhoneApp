@@ -16,20 +16,19 @@ public class Artifact {
      * @return a newly instantiated placeholder artifact.
      */
     public static Artifact newPlaceholder(long uuid) {
-        return new Artifact(-uuid - 1, null, null, null);
+        return new Artifact(-uuid - 1, null, null);
     }
 
     private long uuid;
     private String name;
     private String description;
-    private Bitmap picture;
 
-    public Artifact(long uuid, String name, String description, Bitmap picture) {
+
+    public Artifact(long uuid, String name, String description) {
         Log.d(TAG, "Created artifact with uuid: " + uuid);
         this.uuid = uuid;
         this.name = name;
         this.description = description;
-        this.picture = picture;
     }
 
     public long getUUID() {
@@ -37,7 +36,6 @@ public class Artifact {
     }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public Bitmap getPicture() { return picture; }
     public boolean isPlaceholder() { return uuid < 0; }
 
     @Override

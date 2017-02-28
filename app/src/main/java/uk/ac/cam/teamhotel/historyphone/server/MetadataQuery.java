@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
+import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 
 /**
  * This class has the ability to request images and metadata from the
@@ -91,8 +92,9 @@ public class MetadataQuery {
             String description = jsonObject.getString("description");
             Bitmap image = getImage(uuid);
 
-            // Create new artifact.
-            result = new Artifact(uuid, name, description, image);
+
+            // Create new artifact
+            result = new Artifact(uuid, name, description);
             Log.d(TAG, "Retrieved metadata for '" + String.valueOf(uuid) + "' successfully.");
         } catch (IOException | JSONException e) {
             Log.e(TAG, "I/O error retrieving metadata for artifact '" +

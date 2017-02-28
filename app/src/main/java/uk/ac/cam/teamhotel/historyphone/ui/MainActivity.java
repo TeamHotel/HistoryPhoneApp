@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper.clearConversations();
         databaseHelper.clearMessages();
         databaseHelper.clearArtifacts();
-        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
+        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo"));
 
         // Create the artifact loader.
         artifactLoader = new ArtifactLoader(databaseHelper);

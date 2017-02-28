@@ -24,6 +24,7 @@ import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
+import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 
 public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
@@ -155,17 +156,15 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             descriptionView.setText(artifact.getDescription());
 
             // Format artifact image.
-            if (artifact.getPicture() != null) {
-                // If there is an image associated with the artifact, display it.
-                byte[] outImage = getBitmapAsByteArray(artifact.getPicture());
-                ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
-                Bitmap image = BitmapFactory.decodeStream(imageStream);
+            Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(), getContext().getApplicationContext());
+            if(image != null) {
                 imageView.setImageBitmap(image);
-            } else {
+            }else {
                 // Otherwise, fall back on the launcher icon.
                 imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
                         R.mipmap.ic_launcher));
             }
+
         }
         // TODO: Reformat as resource string.
         distanceView.setText(String.valueOf(distance) + "m");
