@@ -161,8 +161,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                         R.mipmap.ic_launcher));
             }
         }
-        // TODO: Reformat as resource string.
-        distanceView.setText(String.valueOf(distance) + "m");
+        distanceView.setText(String.format(getContext().getString(R.string.distance), distance));
 
         // Return the completed view to render on screen.
         return view;

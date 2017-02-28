@@ -132,7 +132,7 @@ public class ChatActivity extends AppCompatActivity {
                 newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
                 newMessage.setUuid(uuid);
 
-                databaseHelper.addMessage(newMessage );
+                databaseHelper.addMessage(newMessage);
                 chatMessageList.add(newMessage);
                 // Update list of items displayed
                 adapter.notifyDataSetChanged();

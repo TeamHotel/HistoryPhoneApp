@@ -16,9 +16,6 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
-import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
-import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,9 +55,10 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
 
-                // If the Recent Tab is reselected, get a reference to it and call onResume, which will update the view.
+                // If the Recent Tab is reselected, get a reference to it and call onResume,
+                // which will update the view.
                 if(tab.getPosition() == 1){
-                    ((RecentFragment)((TabAdapter) (viewPager.getAdapter())).getItem(1)).onResume();
+                    ((TabAdapter) (viewPager.getAdapter())).getItem(1).onResume();
                 }
             }
         });

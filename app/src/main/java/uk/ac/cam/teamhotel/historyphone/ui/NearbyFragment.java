@@ -33,6 +33,8 @@ public class NearbyFragment extends Fragment {
 
     private static final int REQUEST_ENABLE_BLUETOOTH = 1;
 
+    private static final float DISTANCE_ALPHA = 0.75f;
+
     private Observable<Pair<Artifact, Float>> entriesStream;
 
     /**
@@ -55,12 +57,25 @@ public class NearbyFragment extends Fragment {
                 .groupBy(pair -> pair.first.getUUID())
                 // Send a timeout to remove stale entries from the list.
                 .map(stream -> {
-                    // TODO: Moving average of distances.
                     // Wrap in an array to get around Java's weird closure semantics.
                     final Artifact[] group = new Artifact[] { null };
+                    final float[] distance = new float[] { 0.0f };
+                    final boolean[] initialised = new boolean[] { false };
                     return stream
                             // Store the artifact this stream is grouped by.
-                            .doOnNext(pair -> group[0] = pair.first)
+                            .doOnNext(pair -> {
+                                if (!initialised[0]) {
+                                    group[0] = pair.first;
+                                    distance[0] = pair.second;
+                                    initialised[0] = true;
+                                }
+                            })
+                            // Exponentially average actual distances over multiple scans.
+                            .map(pair -> {
+                                distance[0] = (1 - DISTANCE_ALPHA) * pair.second +
+                                        DISTANCE_ALPHA * distance[0];
+                                return new Pair<>(pair.first, distance[0]);
+                            })
                             // After a timeout without seeing this artifact, throw an error.
                             .timeout(4000, TimeUnit.MILLISECONDS)
                             // When an error is streamed, forward the group artifact at +inf metres.

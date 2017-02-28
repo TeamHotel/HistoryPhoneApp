@@ -72,7 +72,8 @@ public class BeaconScanner {
             }
 
             long uuid = (record[21] << 1) + record[22];
-            float dist = 100.0f - rssi;  // TODO: Replace with actual distance formula.
+            float dist = (float) Math.pow(10.0,
+                    (-80 - rssi) / 20.0);
 
             Beacon beacon = new Beacon(uuid, dist);
             Log.d(TAG, "Scanned beacon: " + beacon.toString());

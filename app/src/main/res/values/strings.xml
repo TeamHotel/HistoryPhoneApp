@@ -4,4 +4,5 @@
     <string name="recent">Recent</string>
     <string name="artifact_image">Artifact image.</string>
     <string name="artifact_description">Artifact description.</string>
+    <string name="distance">%.1fm</string>
 </resources>
