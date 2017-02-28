@@ -1,6 +1,7 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -37,7 +38,12 @@ public class ArtifactLoader {
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
             // Attempt to get Artifact from local database
-            artifact = databaseHelper.getArtifact(uuid);
+            String name = databaseHelper.getName(uuid);
+            String description = databaseHelper.getDesc(uuid);
+            Bitmap picture = StoreBitmapUtility.loadImageFromStorage(uuid, context);
+            if(name != "" && description != "" && picture !=null) {
+                artifact = new Artifact(uuid, name, description, picture);
+            }
         }
         // If the artifact metadata is not present in the db, concurrently retrieve it
         // from the server and return a loading placeholder artifact.

@@ -29,6 +29,7 @@ public class Artifact {
         this.uuid = uuid;
         this.name = name;
         this.description = description;
+        this.picture = picture;
     }
 
     public long getUUID() {

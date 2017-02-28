@@ -13,7 +13,7 @@ public class DbBitmapUtility {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
         if(stream.toByteArray() == null) {
-            Log.d("GETBYTES FUNC", "NULL BYTE ARRAY");
+            Log.d("GET BYTES FUNC", "NULL BYTE ARRAY");
         }
         return stream.toByteArray();
     }

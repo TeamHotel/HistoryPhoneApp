@@ -44,8 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "artifact_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "uuid INTEGER NOT NULL, " +
             "title TEXT NOT NULL, " +
-            "description TEXT NOT NULL, " +
-            "image BLOB )";
+            "description TEXT NOT NULL )";
 
     /**
      * SQL statement to create messages table.
@@ -100,9 +99,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("uuid", artifact.getUUID());
         values.put("title", artifact.getName() );
         values.put("description", artifact.getDescription());
-        if(artifact.getPicture() != null){
-            values.put("image", getBitmapAsByteArray(artifact.getPicture()));
-        }
 
         // insert row
         db.insert(TABLE_ARTIFACTS, null , values);
@@ -145,6 +141,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return artifact;
 
+
+    }
+
+    public String getName(Long uuid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String name = "";
+        String get_name_query = "SELECT title FROM artifacts WHERE uuid="+uuid;
+        final Cursor cursor = db.rawQuery(get_name_query, null);
+
+        // Get name if the query is successful
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    name = cursor.getString(2);
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        db.close();
+
+        return name;
+
+    }
+
+    public String getDesc(Long uuid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String Desc = "";
+        String get_desc_query = "SELECT description FROM artifacts WHERE uuid="+uuid;
+        final Cursor cursor = db.rawQuery(get_desc_query, null);
+
+        // Get name if the query is successful
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    Desc = cursor.getString(3);
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        db.close();
+
+        return Desc;
 
     }
 
