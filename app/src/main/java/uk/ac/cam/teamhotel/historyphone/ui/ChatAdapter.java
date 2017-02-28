@@ -8,17 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.R;
-import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactCache;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 

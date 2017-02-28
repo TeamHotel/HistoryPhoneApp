@@ -22,8 +22,6 @@ import java.util.HashMap;
 import io.reactivex.Observable;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
-import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
@@ -42,10 +40,6 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                           ArrayList<Pair<Artifact, Float>> contents) {
 
         super(activity, R.layout.list_item_nearby, contents);
-
-        ArtifactLoader loader = new ArtifactLoader(new DatabaseHelper(getContext()));
-        contents.add(new Pair<>(loader.load(0L), 120.0f));
-        contents.add(new Pair<>(loader.load(123L), 180.0f));
 
         this.contents = contents;
         positions = new HashMap<>();

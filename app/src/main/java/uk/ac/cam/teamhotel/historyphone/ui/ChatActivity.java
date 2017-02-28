@@ -1,6 +1,5 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +13,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
@@ -23,52 +23,53 @@ import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static boolean ENABLE_CHAT = false;
+    public static final String TAG = "ChatActivity";
+
     private static long uuid;
-    private DatabaseHelper dbHelper;
+    private DatabaseHelper databaseHelper;
     private ChatAdapter adapter;
 
-    public static List<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
+    public static List<ChatMessage> chatMessageList = new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
         // Get artifact uuid passed from previous fragment view
-        uuid = getIntent().getLongExtra("UUID",0L);
-        ENABLE_CHAT = getIntent().getBooleanExtra("ENABLE_CHAT", false);
-        String str = getIntent().getStringExtra("NAME");
-        String desc = getIntent().getStringExtra("DESC");
-        Log.d("CHATACTIVITY_NAME", str +": " + uuid + " : " + desc);
+        uuid = getIntent().getLongExtra("UUID", -1);
+        boolean enableChat = getIntent().getBooleanExtra("ENABLE_CHAT", false);
+        String name = getIntent().getStringExtra("NAME");
+        String description = getIntent().getStringExtra("DESC");
+        Log.d(TAG, name + ": " + uuid + " : " + description);
 
-        // This is defined in the ChatActivity Class so only one instance is ever created (for efficiency) and so it can be accessed by the AsyncTask
-        dbHelper = new DatabaseHelper(this);
-        // Load in messages from database
+        // This is defined in the ChatActivity Class so only one instance is ever created
+        // (for efficiency) and so it can be accessed by the AsyncTask.
+        databaseHelper = ((HistoryPhoneApplication) getApplication()).getDatabaseHelper();
+
+        // Load in messages from the database.
         loadChatListFromDB();
 
         // Send 'init' message and server will reply with object greeting (only if chat enabled).
-        if(ENABLE_CHAT == true) {
+        if (enableChat) {
             new MessageAsyncTask().execute(new MessageContainer("init", uuid));
         }
 
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
-        adapter = new ChatAdapter(getApplicationContext(),chatMessageList );
+        adapter = new ChatAdapter(this, chatMessageList);
         chatMessages.setAdapter(adapter);
 
 
-        // Get the text field view
         EditText editText = (EditText) findViewById(R.id.enterText);
-        // Get the send button
-        Button send_btn = (Button) findViewById(R.id.btn_Send);
+        Button sendButton = (Button) findViewById(R.id.btn_Send);
 
         // If fired from the recent tab, then we don't want the user to be able to chat.
-        if(ENABLE_CHAT == false) {
+        if (!enableChat) {
             editText.setEnabled(false);
-            send_btn.setEnabled(false);
+            sendButton.setEnabled(false);
         }
 
-        dbHelper.printArtifacts();
-        dbHelper.printMessages();
+        databaseHelper.printArtifacts();
+        databaseHelper.printMessages();
 
     }
 
@@ -79,37 +80,34 @@ public class ChatActivity extends AppCompatActivity {
         // Get the text field view
         EditText editText = (EditText) findViewById(R.id.enterText);
 
-            // Setup new ChatMessage object to store in db
-            String message = editText.getText().toString();
-            ChatMessage newMessage = new ChatMessage();
-            newMessage.setMessage_text(message);
-            newMessage.setFrom_user(true);
-            newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
-            newMessage.setUuid(uuid);
+        // Setup new ChatMessage object to store in db
+        String message = editText.getText().toString();
+        ChatMessage newMessage = new ChatMessage();
+        newMessage.setMessage_text(message);
+        newMessage.setFrom_user(true);
+        newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
+        newMessage.setUuid(uuid);
 
-            // Add message to local db messages table
-            dbHelper.addMessage(newMessage);
+        // Add message to local db messages table
+        databaseHelper.addMessage(newMessage);
 
-            // Add or update the conversations table with the most recent timestamp for the current Artifact
-            dbHelper.addToOrUpdateConversations(newMessage);
+        // Add or update the conversations table with the most recent
+        // timestamp for the current Artifact.
+        databaseHelper.addToOrUpdateConversations(newMessage);
+        chatMessageList.add(newMessage);
 
-            chatMessageList.add(newMessage);
+        // Reset the text view to empty
+        editText.setText("");
 
-            // Reset the text view to empty
-            editText.setText("");
-
-            // Send message to server and receive reply.
-            new MessageAsyncTask().execute(new MessageContainer(message, uuid));
-
+        // Send message to server and receive reply.
+        new MessageAsyncTask().execute(new MessageContainer(message, uuid));
     }
 
     /**
      * Called when loading a conversation.
      */
     public void loadChatListFromDB(){
-
-        chatMessageList = dbHelper.returnAllMessages(uuid);
-
+        chatMessageList = databaseHelper.returnAllMessages(uuid);
     }
 
     /**
@@ -134,13 +132,14 @@ public class ChatActivity extends AppCompatActivity {
                 newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
                 newMessage.setUuid(uuid);
 
-                dbHelper.addMessage(newMessage );
+                databaseHelper.addMessage(newMessage );
                 chatMessageList.add(newMessage);
                 // Update list of items displayed
                 adapter.notifyDataSetChanged();
             } else {
                 // No response received - i.e. no connection to server or error with response
-                Snackbar.make(findViewById(R.id.chat_list), "You have lost connection", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.chat_list), "You have lost connection",
+                        Snackbar.LENGTH_LONG).show();
             }
             super.onPostExecute(reply);
         }

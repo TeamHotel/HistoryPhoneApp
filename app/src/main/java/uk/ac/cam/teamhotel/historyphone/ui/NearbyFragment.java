@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.support.v4.app.Fragment;
 
 import io.reactivex.Observable;
+import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
@@ -42,7 +43,8 @@ public class NearbyFragment extends Fragment {
         stopScanning();
 
         // Get the artifact loader from the parent activity.
-        ArtifactLoader artifactLoader = ((MainActivity) getActivity()).getArtifactLoader();
+        ArtifactLoader artifactLoader =
+                ((HistoryPhoneApplication) getActivity().getApplication()).getArtifactLoader();
 
         // Compose the pipeline.
         Log.i(TAG, "Constructing nearby beacon pipeline...");
@@ -53,6 +55,7 @@ public class NearbyFragment extends Fragment {
                 .groupBy(pair -> pair.first.getUUID())
                 // Send a timeout to remove stale entries from the list.
                 .map(stream -> {
+                    // TODO: Moving average of distances.
                     // Wrap in an array to get around Java's weird closure semantics.
                     final Artifact[] group = new Artifact[] { null };
                     return stream
@@ -163,7 +166,7 @@ public class NearbyFragment extends Fragment {
             }
 
             // Check if the item is a loading tile, if so, we do not want a chat session to open on click.
-            if(entry.first.isPlaceholder()) {
+            if (entry.first.isPlaceholder()) {
                 Log.i(TAG, "Loading artifact clicked.");
                 return;
             }
