@@ -94,7 +94,7 @@ public class MetadataQuery {
 
 
             // Create new artifact
-            result = new Artifact(uuid, name, description);
+            result = new Artifact(uuid, name, description, image);
             Log.d(TAG, "Retrieved metadata for '" + String.valueOf(uuid) + "' successfully.");
         } catch (IOException | JSONException e) {
             Log.e(TAG, "I/O error retrieving metadata for artifact '" +

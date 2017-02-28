@@ -39,6 +39,13 @@ public class MainActivity extends AppCompatActivity {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.ViewPager);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.TabLayout);
 
+        // Create the database helper.
+          DatabaseHelper databaseHelper = new DatabaseHelper(this);
+          databaseHelper.clearConversations();
+              databaseHelper.clearMessages();
+              databaseHelper.clearArtifacts();
+              databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
+
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);

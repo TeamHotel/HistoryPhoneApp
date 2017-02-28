@@ -1,10 +1,12 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 import uk.ac.cam.teamhotel.historyphone.server.MetadataQuery;
+import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 
 public class ArtifactLoader {
 
@@ -12,10 +14,12 @@ public class ArtifactLoader {
 
     private DatabaseHelper databaseHelper;
     private ArtifactCache artifactCache;
+    private Context context;
 
-    public ArtifactLoader(DatabaseHelper databaseHelper) {
+    public ArtifactLoader(DatabaseHelper databaseHelper, Context context) {
         this.databaseHelper = databaseHelper;
         artifactCache = new ArtifactCache();
+        this.context = context;
     }
 
 
@@ -75,6 +79,8 @@ public class ArtifactLoader {
 
             // Store the newly retrieved artifact in the cache.
             artifactCache.set(uuid, artifact);
+
+            StoreBitmapUtility.saveToInternalStorage(uuid, artifact.getPicture(), context);
 
             // Store the newly retrieved artifact in the database.
             databaseHelper.addArtifact(artifact);
