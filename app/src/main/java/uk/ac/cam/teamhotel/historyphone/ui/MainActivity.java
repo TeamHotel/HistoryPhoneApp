@@ -16,6 +16,8 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
+import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 

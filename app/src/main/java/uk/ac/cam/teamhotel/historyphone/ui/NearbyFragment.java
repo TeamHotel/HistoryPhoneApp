@@ -180,9 +180,12 @@ public class NearbyFragment extends Fragment {
                 return;
             }
 
+            ArtifactLoader artifactLoader = ((HistoryPhoneApplication) getActivity().getApplication()).getArtifactLoader();
             // Check if the item is a loading tile, if so, we do not want a chat session to open on click.
             if (entry.first.isPlaceholder()) {
                 Log.i(TAG, "Loading artifact clicked.");
+                Artifact loaded = artifactLoader.load(56L);
+                ((NearbyAdapter) listView.getAdapter()).insert(loaded, entry.second);
                 return;
             }
 

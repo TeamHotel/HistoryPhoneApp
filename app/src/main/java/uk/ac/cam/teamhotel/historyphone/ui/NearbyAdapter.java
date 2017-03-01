@@ -46,7 +46,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
         ArtifactLoader artifactLoader = ((HistoryPhoneApplication) getContext().getApplicationContext()).getArtifactLoader();
         contents.add(new Pair<>(artifactLoader.load(0L), 120.0f));
-        contents.add(new Pair<>(artifactLoader.load(123L), 180.0f));
+        contents.add(new Pair<>(artifactLoader.load(56L), 180.0f));
 
         this.contents = contents;
         positions = new HashMap<>();
