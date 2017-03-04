@@ -55,17 +55,19 @@ public class NearbyFragment extends Fragment {
                 .compose(StreamTools.mapLeft(artifactLoader::load))
                 // Group the pairs by their beacon UUID.
                 .groupBy(pair -> pair.first.getUUID())
-                // Send a timeout to remove stale entries from the list.
+                // Perform group processing on artifacts with like UUIDs.
                 .map(stream -> {
                     // Wrap in an array to get around Java's weird closure semantics.
                     final Artifact[] group = new Artifact[] { null };
                     final float[] distance = new float[] { 0.0f };
                     final boolean[] initialised = new boolean[] { false };
                     return stream
-                            // Store the artifact this stream is grouped by.
+                            // Initialise the closure variables.
                             .doOnNext(pair -> {
                                 if (!initialised[0]) {
+                                    // Store the artifact UUID this stream is grouped by.
                                     group[0] = pair.first;
+                                    // Store the initial distance for averaging.
                                     distance[0] = pair.second;
                                     initialised[0] = true;
                                 }
@@ -180,12 +182,10 @@ public class NearbyFragment extends Fragment {
                 return;
             }
 
-            ArtifactLoader artifactLoader = ((HistoryPhoneApplication) getActivity().getApplication()).getArtifactLoader();
-            // Check if the item is a loading tile, if so, we do not want a chat session to open on click.
+            // Check if the item is a loading tile; if so, we do not want
+            // a chat session to open on click.
             if (entry.first.isPlaceholder()) {
                 Log.i(TAG, "Loading artifact clicked.");
-                Artifact loaded = artifactLoader.load(56L);
-                ((NearbyAdapter) listView.getAdapter()).insert(loaded, entry.second);
                 return;
             }
 

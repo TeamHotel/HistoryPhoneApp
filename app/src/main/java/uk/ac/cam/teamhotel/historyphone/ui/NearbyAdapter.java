@@ -13,17 +13,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 import io.reactivex.Observable;
-import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
-import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 
 public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
@@ -41,12 +37,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
     private NearbyAdapter(Activity activity, Observable<Pair<Artifact, Float>> entryStream,
                           ArrayList<Pair<Artifact, Float>> contents) {
-
         super(activity, R.layout.list_item_nearby, contents);
-
-        ArtifactLoader artifactLoader = ((HistoryPhoneApplication) getContext().getApplicationContext()).getArtifactLoader();
-        contents.add(new Pair<>(artifactLoader.load(0L), 120.0f));
-        contents.add(new Pair<>(artifactLoader.load(56L), 180.0f));
 
         this.contents = contents;
         positions = new HashMap<>();
@@ -78,7 +69,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
     public void insert(Artifact artifact, float distance) {
         if (positions.containsKey(artifact.getUUID())) {
             // Remove the entry from the contents.
-            remove(artifact);
+            contents.remove(positions.get(artifact.getUUID()).intValue());
         }
 
         // Insert, maintaining the contents' ordering by distance.
@@ -136,7 +127,9 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
         // Check if an existing view is being reused, otherwise inflate the view.
         if (view == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.list_item_nearby, parent, false);
+            view = LayoutInflater
+                    .from(getContext())
+                    .inflate(R.layout.list_item_nearby, parent, false);
         }
 
         // Lookup view for data population.
@@ -146,7 +139,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
         ImageView imageView = (ImageView) view.findViewById(R.id.artifact_image);
 
         // Populate the data into the template view using the artifact object.
-        if (artifact.getUUID() == -1) {
+        if (artifact.isPlaceholder()) {
             // TODO: Display flashier "loading" tile.
             titleView.setText("Loading...");
             descriptionView.setText("");
@@ -156,25 +149,19 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             descriptionView.setText(artifact.getDescription());
 
             // Format artifact image.
-            Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(), getContext().getApplicationContext());
-            if(image != null) {
+            Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(),
+                    getContext().getApplicationContext());
+            if (image != null) {
                 imageView.setImageBitmap(image);
-            }else {
+            } else {
                 // Otherwise, fall back on the launcher icon.
                 imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
                         R.mipmap.ic_launcher));
             }
-
         }
         distanceView.setText(String.format(getContext().getString(R.string.distance), distance));
 
         // Return the completed view to render on screen.
         return view;
-    }
-
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
     }
 }

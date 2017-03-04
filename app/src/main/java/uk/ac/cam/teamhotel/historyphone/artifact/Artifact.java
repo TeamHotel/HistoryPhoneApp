@@ -37,14 +37,11 @@ public class Artifact {
     }
     public String getName() { return name; }
     public String getDescription() { return description; }
+    public Bitmap getPicture() { return picture; }
     public boolean isPlaceholder() { return uuid < 0; }
 
     @Override
     public String toString() {
         return "Artifact(" + uuid + ", " + name + ")";
-    }
-
-    public Bitmap getPicture() {
-        return picture;
     }
 }

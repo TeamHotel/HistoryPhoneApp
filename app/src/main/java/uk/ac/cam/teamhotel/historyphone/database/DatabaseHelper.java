@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +25,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ARTIFACTS = "artifacts";
     private static final String TABLE_MESSAGES = "messages";
     private static final String TABLE_CONVERSATIONS = "conversations";
-
-    // Table IDs:
-    private static final String ARTIFACTS_ID = "artifact_id";
-    private static final String MESSAGES_ID = "message_id";
-    private static final String MESSAGES_FOREIGN_KEY = "artifact_id";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -100,19 +94,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("title", artifact.getName() );
         values.put("description", artifact.getDescription());
 
-        // insert row
+        // Insert row.
         db.insert(TABLE_ARTIFACTS, null , values);
         db.close();
-
     }
 
     /**
-     * Method to retrieve an Artifact from the artifacts table. Returns NULL object ref if unsuccessful.
+     * Method to retrieve an Artifact from the artifacts
+     * table. Returns NULL object ref if unsuccessful.
      */
-    public Artifact getArtifact(Long uuid){
+    @Deprecated
+    public Artifact getArtifact(long uuid){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        //default return artifact as null
+        // Default return artifact as null.
         Artifact artifact = null;
         String title;
         String description;
@@ -121,7 +116,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String get_artifact_query = "SELECT * FROM artifacts WHERE uuid="+uuid;
         final Cursor cursor = db.rawQuery(get_artifact_query, null);
 
-        //construct artifact object if the query is successful
+        // Construct artifact object if the query is successful.
         if (cursor != null) {
             try {
                 if (cursor.moveToFirst()) {
@@ -140,56 +135,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return artifact;
-
-
     }
 
-    public String getName(Long uuid){
-        SQLiteDatabase db = this.getWritableDatabase();
+    public String getName(long uuid) {
+        String name = null;
 
-        String name = "";
-        String get_name_query = "SELECT title FROM artifacts WHERE uuid="+uuid;
-        final Cursor cursor = db.rawQuery(get_name_query, null);
-
-        // Get name if the query is successful
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    name = cursor.getString(2);
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
+            String nameQuery = "SELECT title FROM artifacts WHERE uuid=" + uuid;
+            try (Cursor cursor = db.rawQuery(nameQuery, null)) {
+                // Get name if the query is successful
+                if (cursor != null && cursor.moveToFirst()) {
+                    name = cursor.getString(0);
                 }
-            } finally {
-                cursor.close();
             }
         }
-
-        db.close();
 
         return name;
 
     }
 
-    public String getDesc(Long uuid){
-        SQLiteDatabase db = this.getWritableDatabase();
+    public String getDescription(long uuid) {
+        String description = null;
 
-        String Desc = "";
-        String get_desc_query = "SELECT description FROM artifacts WHERE uuid="+uuid;
-        final Cursor cursor = db.rawQuery(get_desc_query, null);
-
-        // Get name if the query is successful
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    Desc = cursor.getString(3);
+        try (SQLiteDatabase db = this.getWritableDatabase()) {
+            String descriptionQuery = "SELECT description FROM artifacts WHERE uuid=" + uuid;
+            try (Cursor cursor = db.rawQuery(descriptionQuery, null)) {
+                // Get name if the query is successful.
+                if (cursor != null && cursor.moveToFirst()) {
+                    description = cursor.getString(0);
                 }
-            } finally {
-                cursor.close();
             }
         }
 
-        db.close();
-
-        return Desc;
-
+        return description;
     }
 
     /**
@@ -235,70 +213,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "VALUES ("+ chatMessage.getUuid() +", '" + chatMessage.getTimestamp() + "');";
         db.execSQL(sqlQuery);
         db.close();
-
-    }
-
-    //TODO: delete this debug function on app complete
-    public void printConversations(){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String sqlQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
-        Cursor cursor = db.rawQuery(sqlQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                Log.d("CONVOS",cursor.getString(0) + " " + cursor.getString(1));
-
-            } while (cursor.moveToNext());
-        }
-
     }
 
     /**
      * Method to delete all conversation records (for recent tab population).
      */
-    public void clearConversations(){
+    public void clearConversations() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM conversations");
     }
 
-
     /**
      * Method to delete all message records.
      */
-    public void clearMessages(){
+    public void clearMessages() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM messages");
-    }
-
-    //TODO: delete this debug function on app complete
-    public void printMessages(){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String sqlQuery = "SELECT * FROM messages";
-        Cursor cursor = db.rawQuery(sqlQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                Log.d("Messages", cursor.getString(1) + " : " + cursor.getString(2) );
-
-            } while (cursor.moveToNext());
-        }
-
-    }
-    //TODO: delete this debug function on app complete
-    public void printArtifacts(){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String sqlQuery = "SELECT * FROM artifacts";
-        Cursor cursor = db.rawQuery(sqlQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                Log.d("Artifacts", cursor.getString(0) + " : " + cursor.getString(1) );
-
-            } while (cursor.moveToNext());
-        }
     }
 
     /**
@@ -309,75 +239,114 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM artifacts");
     }
 
-
     /**
-     * Method to return all messages from the messages table, associated with a particular uuid/Artifact.
-     * Used for displaying conversations in the ChatActivity view.
+     * Method to return all messages from the messages table,
+     * associated with a particular uuid/Artifact. Used for
+     * displaying conversations in the ChatActivity view.
      */
-    public List<ChatMessage> returnAllMessages(Long uuid){
-        List<ChatMessage> messageList = new ArrayList<ChatMessage>();
+    public List<ChatMessage> returnAllMessages(long uuid) {
+        List<ChatMessage> messageList = new ArrayList<>();
 
-        String selectQuery = "SELECT * FROM messages, artifacts WHERE messages.artifact_id = artifacts.artifact_id AND artifacts.uuid=" +uuid;
+        String selectQuery = "SELECT * FROM messages, artifacts " +
+                "WHERE messages.artifact_id = artifacts.artifact_id " +
+                "AND artifacts.uuid=" + uuid;
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+            // Looping through all rows and adding to list.
+            if (cursor.moveToFirst()) {
+                do {
+                    ChatMessage newMessage = new ChatMessage();
+                    newMessage.setMessage_id(Integer.parseInt(cursor.getString(0)));
+                    newMessage.setMessage_text(cursor.getString(2));
+                    if (Integer.parseInt(cursor.getString(3)) == 0) {
+                        newMessage.setFrom_user(false);
+                    } else {
+                        newMessage.setFrom_user(true);
+                    }
+                    newMessage.setTimestamp(cursor.getString(4));
 
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-                ChatMessage newMessage = new ChatMessage();
-                newMessage.setMessage_id(Integer.parseInt(cursor.getString(0)));
-                newMessage.setMessage_text(cursor.getString(2));
-                if(Integer.parseInt(cursor.getString(3)) == 0) {
-                    newMessage.setFrom_user(false);
-                }else{
-                    newMessage.setFrom_user(true);
-                }
-                newMessage.setTimestamp(cursor.getString(4));
-
-
-                // Adding contact to list
-                messageList.add(newMessage);
-
-            } while (cursor.moveToNext());
+                    // Adding contact to list.
+                    messageList.add(newMessage);
+                } while (cursor.moveToNext());
+            }
         }
 
         return messageList;
     }
 
     /**
-     * Method to return all conversations from the conversations table, ordered by timestamp of the most recent message.
-     * This returns a list of pairs, corresponding to the uuid and the timestamp.
+     * Method to return all conversations from the conversations table,
+     * ordered by timestamp of the most recent message.
+     *
+     * @return a list of pairs, corresponding to the uuid and the timestamp.
      */
     public List<Pair<Long, String>> returnAllConversations(){
+        List<Pair<Long, String>> entries = new ArrayList<>();
 
-        List<Pair<Long, String>> entries = new ArrayList<Pair<Long, String>>();
-        String selectQuery = "SELECT *  FROM conversations ORDER by datetime(recent_time) DESC ";
+        String selectQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-                //read from db row
-                Pair<Long, String> newRow = new Pair<>(Long.parseLong(cursor.getString(0)), (cursor.getString(1)));
+        try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+            // Looping through all rows and adding to list.
+            if (cursor.moveToFirst()) {
+                do {
+                    // Read from db row.
+                    Pair<Long, String> newRow =
+                            new Pair<>(Long.parseLong(cursor.getString(0)), (cursor.getString(1)));
 
-                //add to list
-                entries.add(newRow);
-
-            } while (cursor.moveToNext());
+                    // Add to list.
+                    entries.add(newRow);
+                } while (cursor.moveToNext());
+            }
         }
 
         return entries;
     }
 
-    /**
-     * Method for converting bitmap to byte array for storing in the database.
-     */
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
+    public void printConversations() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
+
+        try (Cursor cursor = db.rawQuery(sqlQuery, null)) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Log.d("CONVOS", cursor.getString(0) + " " + cursor.getString(1));
+
+                } while (cursor.moveToNext());
+            }
+        }
+    }
+
+    public void printMessages() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM messages";
+
+        try (Cursor cursor = db.rawQuery(sqlQuery, null)) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Log.d("Messages", cursor.getString(1) + " : " + cursor.getString(2));
+
+                } while (cursor.moveToNext());
+            }
+        }
+    }
+
+    public void printArtifacts() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT * FROM artifacts";
+
+        try (Cursor cursor = db.rawQuery(sqlQuery, null)) {
+            if (cursor.moveToFirst()) {
+                do {
+                    Log.d("Artifacts", cursor.getString(0) + " : " + cursor.getString(1));
+
+                } while (cursor.moveToNext());
+            }
+        }
     }
 }

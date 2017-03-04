@@ -23,7 +23,6 @@ public class ArtifactLoader {
         this.context = context;
     }
 
-
     /**
      * Load a single Artifact object from the cache. If the Artifact is not present
      * in the cache, it is loaded from the database. If the Artifact is not present
@@ -32,16 +31,17 @@ public class ArtifactLoader {
      * @param uuid UUID of the requested Artifact object.
      * @return a reference to the loaded artifact object, or a placeholder if not found.
      */
-    public Artifact load(Long uuid) {
+    public Artifact load(long uuid) {
+        // Attempt to retrieve the Artifact object from the cache.
         Artifact artifact = artifactCache.get(uuid);
 
         // If the Artifact object has not been cached, attempt to construct it from the db.
         if (artifact == null) {
-            // Attempt to get Artifact from local database
+            // Attempt to load the Artifact from local database and storage.
             String name = databaseHelper.getName(uuid);
-            String description = databaseHelper.getDesc(uuid);
+            String description = databaseHelper.getDescription(uuid);
             Bitmap picture = StoreBitmapUtility.loadImageFromStorage(uuid, context);
-            if(name != "" && description != "" && picture !=null) {
+            if (name != null && description != null && picture != null) {
                 artifact = new Artifact(uuid, name, description, picture);
             }
         }
@@ -61,7 +61,7 @@ public class ArtifactLoader {
      *
      * @param uuid UUID of the requested artifact.
      */
-    public void retrieve(Long uuid) { new ArtifactRetrievalTask().execute(uuid); }
+    public void retrieve(long uuid) { new ArtifactRetrievalTask().execute(uuid); }
 
     private class ArtifactRetrievalTask extends AsyncTask<Long, Void, Artifact> {
 
@@ -86,10 +86,9 @@ public class ArtifactLoader {
             // Store the newly retrieved artifact in the cache.
             artifactCache.set(uuid, artifact);
 
-            StoreBitmapUtility.saveToInternalStorage(uuid, artifact.getPicture(), context);
-
             // Store the newly retrieved artifact in the database.
             databaseHelper.addArtifact(artifact);
+            StoreBitmapUtility.saveToInternalStorage(uuid, artifact.getPicture(), context);
 
             super.onPostExecute(artifact);
         }
