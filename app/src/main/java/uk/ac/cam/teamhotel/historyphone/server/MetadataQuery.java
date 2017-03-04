@@ -28,8 +28,8 @@ import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 public class MetadataQuery {
 
     private static final String TAG = "MetadataQuery";
-    private static final String INFO_URL = "http://10.0.2.2:12345/api/info?id=";
-    private static final String IMG_URL = "http://10.0.2.2:12345/img/";
+    private static final String INFO_URL = "http://172.26.204.34:12345/api/info?id=";
+    private static final String IMG_URL = "http://172.26.204.34:12345/img/";
     private static final String IMG_EXT = ".png";
 
     /**

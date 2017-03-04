@@ -18,6 +18,8 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 // TODO: Check workflow of timestamps / datetimes with database and the app.
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    public static final String TAG = "DatabaseHelper";
+
     private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "HistoryPhoneDB";
 
@@ -176,27 +178,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addMessage(ChatMessage chatMessage){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        //get id of artifact that we want to add messages for
-        String get_id_query = "SELECT artifact_id FROM artifacts WHERE uuid="+chatMessage.getUuid();
-        final Cursor cursor = db.rawQuery(get_id_query, null);
-        int id =0;
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    id = cursor.getInt(0);
-                }
-            } finally {
-                cursor.close();
+        // Get the id of the artifact that we want to add messages for.
+        String getIDQuery = "SELECT artifact_id FROM artifacts WHERE uuid=" +
+                chatMessage.getArtifactUUID();
+
+        int id = -1;
+        try (Cursor cursor = db.rawQuery(getIDQuery, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                id = cursor.getInt(0);
             }
         }
 
         ContentValues values = new ContentValues();
-        values.put("artifact_id", id );
-        values.put("message_text", chatMessage.getMessage_text());
-        values.put("from_user", chatMessage.isFrom_user());
+        values.put("artifact_id", id);
+        values.put("message_text", chatMessage.getText());
+        values.put("from_user", (chatMessage.getType() == ChatMessage.TYPE_FROM_USER));
         values.put("created_at", chatMessage.getTimestamp());
 
-        // insert row
+        // Insert the newly built row.
         db.insert(TABLE_MESSAGES, null , values);
         db.close();
     }
@@ -210,7 +209,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String sqlQuery = "INSERT OR REPLACE INTO conversations (uuid, recent_time) " +
-                "VALUES ("+ chatMessage.getUuid() +", '" + chatMessage.getTimestamp() + "');";
+                "VALUES ("+ chatMessage.getArtifactUUID() +", '" + chatMessage.getTimestamp() + "');";
         db.execSQL(sqlQuery);
         db.close();
     }
@@ -257,12 +256,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     ChatMessage newMessage = new ChatMessage();
-                    newMessage.setMessage_id(Integer.parseInt(cursor.getString(0)));
-                    newMessage.setMessage_text(cursor.getString(2));
+                    newMessage.setId(Integer.parseInt(cursor.getString(0)));
+                    newMessage.setText(cursor.getString(2));
                     if (Integer.parseInt(cursor.getString(3)) == 0) {
-                        newMessage.setFrom_user(false);
+                        newMessage.setFromUser(false);
                     } else {
-                        newMessage.setFrom_user(true);
+                        newMessage.setFromUser(true);
                     }
                     newMessage.setTimestamp(cursor.getString(4));
 
@@ -310,11 +309,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String sqlQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
 
+        Log.d(TAG, "Conversations in database:");
         try (Cursor cursor = db.rawQuery(sqlQuery, null)) {
             if (cursor.moveToFirst()) {
                 do {
-                    Log.d("CONVOS", cursor.getString(0) + " " + cursor.getString(1));
-
+                    Log.d(TAG, "Conversation " + cursor.getString(0) + ": " + cursor.getString(1));
                 } while (cursor.moveToNext());
             }
         }
@@ -325,11 +324,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String sqlQuery = "SELECT * FROM messages";
 
+        Log.d(TAG, "Messages in database:");
         try (Cursor cursor = db.rawQuery(sqlQuery, null)) {
             if (cursor.moveToFirst()) {
                 do {
-                    Log.d("Messages", cursor.getString(1) + " : " + cursor.getString(2));
-
+                    Log.d(TAG, "Message " + cursor.getString(0) + ": " + cursor.getString(2));
                 } while (cursor.moveToNext());
             }
         }
@@ -340,11 +339,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String sqlQuery = "SELECT * FROM artifacts";
 
+        Log.d(TAG, "Artifacts in database:");
         try (Cursor cursor = db.rawQuery(sqlQuery, null)) {
             if (cursor.moveToFirst()) {
                 do {
-                    Log.d("Artifacts", cursor.getString(0) + " : " + cursor.getString(1));
-
+                    Log.d(TAG, "Artifact " + cursor.getString(0) + ": " + cursor.getString(1) +
+                            ", \"" + cursor.getString(2) + "\"");
                 } while (cursor.moveToNext());
             }
         }

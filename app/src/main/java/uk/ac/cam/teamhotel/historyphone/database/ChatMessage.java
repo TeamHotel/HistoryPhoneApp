@@ -2,56 +2,31 @@ package uk.ac.cam.teamhotel.historyphone.database;
 
 public class ChatMessage {
 
-    private Integer message_id;
-    private String message_text;
-    private boolean from_user;
+    public static final int TYPE_FROM_ARTIFACT = 0;
+    public static final int TYPE_FROM_USER = 1;
+
+    private int id;
+    private String text;
+    private int type;
     private String timestamp;
+    /** Associated artifactUUID, for easier processing. */
+    private long artifactUUID;
 
-    //associated uuid, for easier processing
-    private long uuid;
+    // Getters and setters.
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    //getters and setters
-    public Integer getMessage_id() {
-        return message_id;
+    public String getText() { return text; }
+    public void setText(String text) { this.text = text; }
+
+    public int getType() { return type; }
+    public void setFromUser(boolean fromUser) {
+        type = fromUser ? TYPE_FROM_USER : TYPE_FROM_ARTIFACT;
     }
 
-    public void setMessage_id(Integer message_id) {
-        this.message_id = message_id;
-    }
+    public String getTimestamp() { return timestamp; }
+    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
 
-    public String getMessage_text() {
-        return message_text;
-    }
-
-    public void setMessage_text(String message_text) {
-        this.message_text = message_text;
-    }
-
-    public int isFrom_user() {
-        if(from_user == true){
-            return 1;
-        }else{
-            return 0;
-        }
-    }
-
-    public void setFrom_user(boolean from_user) {
-        this.from_user = from_user;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public long getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(long uuid) {
-        this.uuid = uuid;
-    }
+    public long getArtifactUUID() { return artifactUUID; }
+    public void setArtifactUUID(long artifactUUID) { this.artifactUUID = artifactUUID; }
 }
