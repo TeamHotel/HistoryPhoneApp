@@ -25,7 +25,6 @@ public class Artifact {
     private Bitmap picture;
 
     public Artifact(long uuid, String name, String description, Bitmap picture) {
-        Log.d(TAG, "Created artifact with uuid: " + uuid);
         this.uuid = uuid;
         this.name = name;
         this.description = description;

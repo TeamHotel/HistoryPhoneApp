@@ -81,10 +81,13 @@ public class NearbyFragment extends Fragment {
                             // After a timeout without seeing this artifact, throw an error.
                             .timeout(4000, TimeUnit.MILLISECONDS)
                             // When an error is streamed, forward the group artifact at +inf metres.
-                            .onErrorReturn(error -> new Pair<>(
-                                    group[0],
-                                    Float.POSITIVE_INFINITY
-                            ));
+                            .onErrorReturn(error -> {
+                                Log.d(TAG, "Beacon " + group[0].getUUID() + " timed out.");
+                                return new Pair<>(
+                                        group[0],
+                                        Float.POSITIVE_INFINITY
+                                );
+                            });
                 })
                 // Recombine the streams into one.
                 .flatMap(stream -> stream);
