@@ -88,10 +88,6 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
                 idImage.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
                         R.mipmap.ic_launcher));
             }
-        } else {
-            // TODO: Add a different user image.
-            idImage.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
-                    R.mipmap.ic_launcher));
         }
 
         // Return the completed view to render on screen.

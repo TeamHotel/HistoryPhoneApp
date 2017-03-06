@@ -69,10 +69,10 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
                 getContext().getApplicationContext());
         if(image != null) {
             imageView.setImageBitmap(image);
-        }else {
-            // Otherwise, fall back on the launcher icon.
+        } else {
+            // Otherwise, fall back on the loading icon.
             imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
-                    R.mipmap.ic_launcher));
+                    R.drawable.ic_loading));
         }
 
         return view;
