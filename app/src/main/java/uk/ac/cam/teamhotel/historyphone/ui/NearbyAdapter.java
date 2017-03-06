@@ -140,9 +140,10 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
         // Populate the data into the template view using the artifact object.
         if (artifact.isPlaceholder()) {
-            // TODO: Display flashier "loading" tile.
-            titleView.setText("Loading...");
+            titleView.setText(getContext().getText(R.string.loading));
             descriptionView.setText("");
+            imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
+                    R.drawable.ic_loading));
         } else {
             // Set parameters of artifact tile.
             titleView.setText(artifact.getName());
@@ -154,9 +155,9 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             if (image != null) {
                 imageView.setImageBitmap(image);
             } else {
-                // Otherwise, fall back on the launcher icon.
+                // Otherwise, fall back on the loading icon.
                 imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(),
-                        R.mipmap.ic_launcher));
+                        R.drawable.ic_loading));
             }
         }
         distanceView.setText(String.format(getContext().getString(R.string.distance), distance));
