@@ -13,16 +13,33 @@ public class TimeStampHelper {
         return sDF.format(date);
     }
 
-    public static String formatTimeStamp(String timestamp){
+    public static String formatTimeStamp(String timestamp) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
 
             Date date = sdf.parse(timestamp);
 
-            SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy HH:mm a");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-            return "Sent: " + sdf2.format(date);
+            return sdf2.format(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "error";
+    }
+
+    public static String formatTime(String timestamp) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+
+            Date date = sdf.parse(timestamp);
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
+
+            return sdf2.format(date);
 
         } catch (ParseException e) {
             e.printStackTrace();

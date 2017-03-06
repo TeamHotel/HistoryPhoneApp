@@ -9,50 +9,34 @@
     android:paddingLeft="@dimen/list_item_horizontal_margin"
     android:paddingRight="@dimen/list_item_horizontal_margin">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_toLeftOf="@+id/layout2">
-
-        <TextView
-            android:id="@+id/chat_message"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignLeft="@id/id_image"
-            android:padding="10dp"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
+    <TextView
+        android:id="@+id/chat_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@id/layout"
+        android:padding="10dp"
+        android:textSize="16sp" />
 
     <LinearLayout
-        android:id="@+id/layout2"
+        android:id="@+id/layout"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_alignParentEnd="true">
 
         <ImageView
             android:id="@+id/id_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:srcCompat="@mipmap/ic_launcher"
-            android:contentDescription="@string/artifact_image"/>
+            android:contentDescription="@string/artifact_image" />
+
         <TextView
             android:id="@+id/timestamp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:textAlignment="center"
-            android:textSize="8sp" />
+            android:textSize="10dp" />
     </LinearLayout>
-
-
-
-
-
-
-
 </RelativeLayout>

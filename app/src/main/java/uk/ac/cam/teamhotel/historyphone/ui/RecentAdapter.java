@@ -21,6 +21,7 @@ import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
+import uk.ac.cam.teamhotel.historyphone.utils.TimeStampHelper;
 
 public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
 
@@ -61,7 +62,7 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
         // Populate the data into the template view using the artifact object.
         titleView.setText(artifact.getName());
         descriptionView.setText(artifact.getDescription());
-        timestamp.setText(entry.second);
+        timestamp.setText(TimeStampHelper.formatTimeStamp(entry.second));
 
         // Format artifact image.
         Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(),

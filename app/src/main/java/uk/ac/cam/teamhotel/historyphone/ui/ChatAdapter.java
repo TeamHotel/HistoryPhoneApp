@@ -74,7 +74,7 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         // Populate the data into the template view using the data object.
         // Set parameters of artifact tile.
         messageText.setText(chatMessage.getText());
-        timestamp.setText(TimeStampHelper.formatTimeStamp(chatMessage.getTimestamp()));
+        timestamp.setText(TimeStampHelper.formatTime(chatMessage.getTimestamp()));
 
         // Set the user ID image.
         if (type == ChatMessage.TYPE_FROM_ARTIFACT) {
