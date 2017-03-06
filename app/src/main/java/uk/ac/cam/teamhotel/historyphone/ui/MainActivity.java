@@ -48,13 +48,6 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setIcon(R.drawable.ic_actionbar);
         }
 
-        // Create the database helper.
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        databaseHelper.clearConversations();
-        databaseHelper.clearMessages();
-        databaseHelper.clearArtifacts();
-        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
-
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);

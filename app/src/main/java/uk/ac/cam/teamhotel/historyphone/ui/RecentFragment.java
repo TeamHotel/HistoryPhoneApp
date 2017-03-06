@@ -1,7 +1,5 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,7 +18,7 @@ import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 
-public class RecentFragment extends Fragment{
+public class RecentFragment extends Fragment {
 
     public static final String TAG = "RecentFragment";
 
@@ -32,16 +30,10 @@ public class RecentFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_recent, container, false);
-
-        // Setup helper and load list of pairs from database, in order of time.
-        databaseHelper = ((HistoryPhoneApplication) getActivity().getApplication())
-                .getDatabaseHelper();
-
-        listView = (ListView) rootView.findViewById(R.id.recent_list);
-        listView.setAdapter(new RecentAdapter(getActivity(), conversationList));
+        View view = inflater.inflate(R.layout.fragment_recent, container, false);
 
         // Set up the click listener for the list view.
+        listView = (ListView) view.findViewById(R.id.recent_list);
         listView.setOnItemClickListener((parent, rowView, position, id) -> {
             Intent intent = new Intent(getActivity(), ChatActivity.class);
 
@@ -64,23 +56,24 @@ public class RecentFragment extends Fragment{
             startActivity(intent);
         });
 
-        loadConversationsFromDB();
-
-        return rootView;
+        return view;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        databaseHelper = ((HistoryPhoneApplication) ((Activity) context).getApplication())
+        databaseHelper = ((HistoryPhoneApplication) getActivity().getApplication())
                 .getDatabaseHelper();
+
+        listView.setAdapter(new RecentAdapter(getActivity(), conversationList));
+
+        loadConversationsFromDB();
     }
 
     /**
-     * Method overridden to load in additions from the DB, re-attach the list adapter
-     * and then notify it of changes. This is called when the tab is reselected by the
-     * user, allowing for dynamic refreshing.
+     * Method overridden to load in additions from the DB. This is called when the
+     * tab is reselected by the user, allowing for dynamic refreshing.
      */
     @Override
     public void onResume() {
@@ -98,10 +91,8 @@ public class RecentFragment extends Fragment{
             return;
         }
 
-        List<Pair<Long, String>> newConversationList = databaseHelper.returnAllConversations();
         conversationList.clear();
-        conversationList.addAll(newConversationList);
-        databaseHelper.printConversations();
+        conversationList.addAll(databaseHelper.returnAllConversations());
         ((RecentAdapter) listView.getAdapter()).notifyDataSetChanged();
     }
 }

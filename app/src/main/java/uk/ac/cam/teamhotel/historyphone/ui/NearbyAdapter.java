@@ -26,7 +26,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
 
     public static final String TAG = "NearbyAdapter";
 
-    private static final float THRESHOLD = 300.0f;
+    private static final float THRESHOLD = 10.0f;
 
     private ArrayList<Pair<Artifact, Float>> contents;
     private HashMap<Long, Integer> positions;

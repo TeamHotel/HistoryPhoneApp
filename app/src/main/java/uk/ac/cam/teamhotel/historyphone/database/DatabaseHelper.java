@@ -89,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Method to add an Artifact to the artifacts table.
      */
     public void addArtifact(Artifact artifact) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("uuid", artifact.getUUID());
@@ -101,48 +101,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /**
-     * Method to retrieve an Artifact from the artifacts
-     * table. Returns NULL object ref if unsuccessful.
-     */
-    @Deprecated
-    public Artifact getArtifact(long uuid){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // Default return artifact as null.
-        Artifact artifact = null;
-        String title;
-        String description;
-        Bitmap picture = null;
-
-        String get_artifact_query = "SELECT * FROM artifacts WHERE uuid="+uuid;
-        final Cursor cursor = db.rawQuery(get_artifact_query, null);
-
-        // Construct artifact object if the query is successful.
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    title = cursor.getString(2);
-                    description = cursor.getString(3);
-                    if(!cursor.isNull(4)) {
-                        byte[] byteArray = cursor.getBlob(4);
-                        picture = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-                    }
-                    artifact = new Artifact(uuid, title, description, picture);
-
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-
-        return artifact;
-    }
-
     public String getName(long uuid) {
         String name = null;
 
-        try (SQLiteDatabase db = this.getWritableDatabase()) {
+        try (SQLiteDatabase db = getWritableDatabase()) {
             String nameQuery = "SELECT title FROM artifacts WHERE uuid=" + uuid;
             try (Cursor cursor = db.rawQuery(nameQuery, null)) {
                 // Get name if the query is successful
@@ -159,7 +121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getDescription(long uuid) {
         String description = null;
 
-        try (SQLiteDatabase db = this.getWritableDatabase()) {
+        try (SQLiteDatabase db = getWritableDatabase()) {
             String descriptionQuery = "SELECT description FROM artifacts WHERE uuid=" + uuid;
             try (Cursor cursor = db.rawQuery(descriptionQuery, null)) {
                 // Get name if the query is successful.
@@ -176,7 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Method to add a ChatMessage to the messages table.
      */
     public void addMessage(ChatMessage chatMessage){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         // Get the id of the artifact that we want to add messages for.
         String getIDQuery = "SELECT artifact_id FROM artifacts WHERE uuid=" +
@@ -196,7 +158,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("created_at", chatMessage.getTimestamp());
 
         // Insert the newly built row.
-        db.insert(TABLE_MESSAGES, null , values);
+        db.insert(TABLE_MESSAGES, null, values);
         db.close();
     }
 
@@ -205,8 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Method to add record to table if not exists else update record with latest timestamp.
      */
     public void addToOrUpdateConversations(ChatMessage chatMessage){
-
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         String sqlQuery = "INSERT OR REPLACE INTO conversations (uuid, recent_time) " +
                 "VALUES ("+ chatMessage.getArtifactUUID() +", '" + chatMessage.getTimestamp() + "');";
@@ -218,24 +179,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Method to delete all conversation records (for recent tab population).
      */
     public void clearConversations() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM conversations");
+        db.close();
     }
 
     /**
      * Method to delete all message records.
      */
     public void clearMessages() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM messages");
+        db.close();
     }
 
     /**
      * Method to delete all Artifact records.
      */
     public void clearArtifacts(){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM artifacts");
+        db.close();
     }
 
     /**
@@ -250,7 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "WHERE messages.artifact_id = artifacts.artifact_id " +
                 "AND artifacts.uuid=" + uuid;
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         try (Cursor cursor = db.rawQuery(selectQuery, null)) {
             // Looping through all rows and adding to list.
             if (cursor.moveToFirst()) {
@@ -285,7 +249,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         try (Cursor cursor = db.rawQuery(selectQuery, null)) {
             // Looping through all rows and adding to list.

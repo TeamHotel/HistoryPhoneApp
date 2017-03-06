@@ -14,8 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
@@ -66,7 +64,8 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
         timestamp.setText(entry.second);
 
         // Format artifact image.
-        Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(), getContext().getApplicationContext());
+        Bitmap image = StoreBitmapUtility.loadImageFromStorage(artifact.getUUID(),
+                getContext().getApplicationContext());
         if(image != null) {
             imageView.setImageBitmap(image);
         }else {
@@ -76,11 +75,5 @@ public class RecentAdapter extends ArrayAdapter<Pair<Long, String>> {
         }
 
         return view;
-    }
-
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
     }
 }

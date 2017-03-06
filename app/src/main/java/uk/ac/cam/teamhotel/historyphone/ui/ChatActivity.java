@@ -18,6 +18,7 @@ import java.util.List;
 
 import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
+import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.database.ChatMessage;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
@@ -29,7 +30,7 @@ public class ChatActivity extends AppCompatActivity {
 
     public static final String TAG = "ChatActivity";
 
-    private long uuid;
+    private Artifact artifact;
     private DatabaseHelper databaseHelper;
     private ChatAdapter adapter;
     private List<ChatMessage> chatMessageList = new ArrayList<>();
@@ -40,15 +41,17 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         // Get artifact UUID passed from previous fragment view.
-        uuid = getIntent().getLongExtra("UUID", -1);
+        long uuid = getIntent().getLongExtra("UUID", -1);
         boolean enableChat = getIntent().getBooleanExtra("ENABLE_CHAT", false);
 
         // Get the database helper and artifact loader from the application instance.
         databaseHelper = ((HistoryPhoneApplication) getApplication()).getDatabaseHelper();
         ArtifactLoader artifactLoader =
                 ((HistoryPhoneApplication) getApplication()).getArtifactLoader();
+        artifact = artifactLoader.load(uuid);
 
         // Load in messages from the database.
+        databaseHelper.printMessages();
         loadChatListFromDB();
 
         // Send 'init' message and server will reply with object greeting (only if chat enabled).
@@ -62,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
             Log.e(TAG, "Actionbar is null.");
         } else {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(artifact.getName());
         }
 
         // Set up the adapter for the chat message list.
@@ -108,7 +112,7 @@ public class ChatActivity extends AppCompatActivity {
         newMessage.setText(message);
         newMessage.setFromUser(true);
         newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
-        newMessage.setArtifactUUID(uuid);
+        newMessage.setArtifactUUID(artifact.getUUID());
 
         // Add message to local db messages table
         databaseHelper.addMessage(newMessage);
@@ -122,14 +126,14 @@ public class ChatActivity extends AppCompatActivity {
         editText.setText("");
 
         // Send message to server and receive reply.
-        new MessageAsyncTask().execute(new MessageContainer(message, uuid));
+        new MessageAsyncTask().execute(new MessageContainer(message, artifact.getUUID()));
     }
 
     /**
      * Called when loading a conversation.
      */
     private void loadChatListFromDB(){
-        chatMessageList = databaseHelper.returnAllMessages(uuid);
+        chatMessageList = databaseHelper.returnAllMessages(artifact.getUUID());
     }
 
     /**
@@ -152,7 +156,7 @@ public class ChatActivity extends AppCompatActivity {
                 newMessage.setText(reply);
                 newMessage.setFromUser(false);
                 newMessage.setTimestamp(TimeStampHelper.getTimeStamp());
-                newMessage.setArtifactUUID(uuid);
+                newMessage.setArtifactUUID(artifact.getUUID());
 
                 databaseHelper.addMessage(newMessage);
                 chatMessageList.add(newMessage);
