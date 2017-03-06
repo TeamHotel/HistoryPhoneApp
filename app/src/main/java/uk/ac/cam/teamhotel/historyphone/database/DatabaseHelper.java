@@ -280,7 +280,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @return a list of pairs, corresponding to the uuid and the timestamp.
      */
-    public List<Pair<Long, String>> returnAllConversations(){
+    public List<Pair<Long, String>> returnAllConversations() {
         List<Pair<Long, String>> entries = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM conversations ORDER by datetime(recent_time) DESC";

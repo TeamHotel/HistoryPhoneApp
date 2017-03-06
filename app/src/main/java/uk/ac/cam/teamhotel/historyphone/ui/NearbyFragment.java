@@ -94,10 +94,23 @@ public class NearbyFragment extends Fragment {
 
         // Begin scanning for beacons.
         startScanning();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // Set up the Bluetooth event receiver.
         getActivity().registerReceiver(bluetoothEventReceiver,
                 new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Unregister the Bluetooth event receiver.
+        getActivity().unregisterReceiver(bluetoothEventReceiver);
     }
 
     /**
