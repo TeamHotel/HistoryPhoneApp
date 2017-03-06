@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 // Set up the text input box.
                 View view = getLayoutInflater().inflate(R.layout.dialog_host, null, false);
                 final EditText input = (EditText) view.findViewById(R.id.host_input);
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+                input.setText(((HistoryPhoneApplication) getApplication()).getHost());
                 builder.setView(view);
                 // Set up the button callbacks.
                 builder.setPositiveButton("Set", (dialog, which) ->

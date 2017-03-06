@@ -25,7 +25,7 @@ public class HistoryPhoneApplication extends Application {
 
         // Load the hostname.
         SharedPreferences prefs = getSharedPreferences(PREFS, 0);
-        host = prefs.getString(PREF_HOSTNAME, "localhost");
+        host = prefs.getString(PREF_HOSTNAME, "localhost:12345");
 
     }
 
