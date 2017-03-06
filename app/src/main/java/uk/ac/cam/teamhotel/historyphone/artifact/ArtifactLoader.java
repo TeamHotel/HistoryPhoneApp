@@ -1,10 +1,12 @@
 package uk.ac.cam.teamhotel.historyphone.artifact;
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 import uk.ac.cam.teamhotel.historyphone.server.MetadataQuery;
 import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
@@ -15,12 +17,12 @@ public class ArtifactLoader {
 
     private DatabaseHelper databaseHelper;
     private ArtifactCache artifactCache;
-    private Context context;
+    private Application application;
 
-    public ArtifactLoader(DatabaseHelper databaseHelper, Context context) {
+    public ArtifactLoader(DatabaseHelper databaseHelper, Application application) {
         this.databaseHelper = databaseHelper;
         artifactCache = new ArtifactCache();
-        this.context = context;
+        this.application = application;
     }
 
     /**
@@ -40,7 +42,7 @@ public class ArtifactLoader {
             // Attempt to load the Artifact from local database and storage.
             String name = databaseHelper.getName(uuid);
             String description = databaseHelper.getDescription(uuid);
-            Bitmap picture = StoreBitmapUtility.loadImageFromStorage(uuid, context);
+            Bitmap picture = StoreBitmapUtility.loadImageFromStorage(uuid, application);
             if (name != null && description != null && picture != null) {
                 artifact = new Artifact(uuid, name, description, picture);
             }
@@ -71,7 +73,8 @@ public class ArtifactLoader {
         protected Artifact doInBackground(Long... params) {
             // Invoke static method to download artifact with given uuid.
             uuid = params[0];
-            return MetadataQuery.getArtifact(params[0]);
+            return MetadataQuery.getArtifact(params[0],
+                    ((HistoryPhoneApplication) application).getHost());
         }
 
         @Override
@@ -88,7 +91,7 @@ public class ArtifactLoader {
 
             // Store the newly retrieved artifact in the database.
             databaseHelper.addArtifact(artifact);
-            StoreBitmapUtility.saveToInternalStorage(uuid, artifact.getPicture(), context);
+            StoreBitmapUtility.saveToInternalStorage(uuid, artifact.getPicture(), application);
 
             super.onPostExecute(artifact);
         }

@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,22 +29,22 @@ import uk.ac.cam.teamhotel.historyphone.utils.StoreBitmapUtility;
 public class MetadataQuery {
 
     private static final String TAG = "MetadataQuery";
-    private static final String INFO_URL = "http://172.26.204.34:12345/api/info?id=";
-    private static final String IMG_URL = "http://172.26.204.34:12345/img/";
-    private static final String IMG_EXT = ".png";
+    private static final String INFO_URL = "http://%s/api/info?id=%d";
+    private static final String IMG_URL = "http://%s/img/%d.png";
 
     /**
      * Get the bitmap associated with a particular artifact from the server.
      *
      * @param uuid UUID of the requested artifact.
+     * @param host Hostname of the chatbot server.
      * @return the bitmap associated with an artifact.
      */
-    public static Bitmap getImage(long uuid) {
+    public static Bitmap getImage(long uuid, String host) {
         Bitmap result = null;
         Log.d(TAG, "Requesting image for artifact '" + String.valueOf(uuid) + "'...");
         try {
             // Create url string.
-            String urlString = IMG_URL + String.valueOf(uuid) + IMG_EXT;
+            String urlString = String.format(Locale.UK, IMG_URL, host, uuid);
 
             // Open the connection connection.
             URL url = new URL(urlString);
@@ -76,22 +77,21 @@ public class MetadataQuery {
      * object. In the event of an error, null is returned.
      *
      * @param uuid UUID of the requested artifact.
+     * @param host Hostname of the chatbot server.
      * @return the newly built artifact object.
      */
-    public static Artifact getArtifact(long uuid) {
+    public static Artifact getArtifact(long uuid, String host) {
         Log.d(TAG, "Querying server for artifact '" + String.valueOf(uuid) + "'...");
         Artifact result = null;
-        // TODO: Change URL for when the server is not running on localhost.
-        String url = INFO_URL + String.valueOf(uuid);
+        String urlString = String.format(Locale.UK, INFO_URL, host, uuid);
         try {
             // Read JSON from server.
-            JSONObject jsonObject = readJsonFromUrl(url);
+            JSONObject jsonObject = readJsonFromUrl(urlString);
 
             // Extract data from JSON.
             String name = jsonObject.getString("name");
             String description = jsonObject.getString("description");
-            Bitmap image = getImage(uuid);
-
+            Bitmap image = getImage(uuid, host);
 
             // Create new artifact
             result = new Artifact(uuid, name, description, image);
@@ -106,11 +106,11 @@ public class MetadataQuery {
     /**
      * Build a JSON object from the response of an HTTP GET request.
      *
-     * @param url String URL of the request.
+     * @param urlString String URL of the request.
      * @return the newly built JSON object.
      */
-    public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-        URLConnection connection = new URL(url).openConnection();
+    public static JSONObject readJsonFromUrl(String urlString) throws IOException, JSONException {
+        URLConnection connection = new URL(urlString).openConnection();
         // Set timeout so the app doesn't stall.
         connection.setConnectTimeout(500);
         try (InputStream is = connection.getInputStream()) {

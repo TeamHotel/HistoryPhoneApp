@@ -15,8 +15,8 @@ public class MessageSender {
     /**
      * @return a string which encodes the answer message from the server.
      */
-    public static String sendMessage(String message, long uuid) {
-        String urlString = "http://172.26.204.34:12345/api/response?message=";
+    public static String sendMessage(String message, long uuid, String host) {
+        String urlString = "http://%s/api/response?message=%s&uuid=%d";
 
         if (message.equals("")) {
             return null;
@@ -25,8 +25,7 @@ public class MessageSender {
         try {
             // Encode the message in UTF-8.
             String urlMessage = URLEncoder.encode(message, "UTF-8");
-            urlString += urlMessage;
-            urlString += "&uuid=" + String.valueOf(uuid);
+            urlString = String.format(urlString, host, urlMessage, uuid);
 
             // Get response from server.
             JSONObject jsonObject = MetadataQuery.readJsonFromUrl(urlString);

@@ -146,7 +146,8 @@ public class ChatActivity extends AppCompatActivity {
             // Invoke static method to download artifact with uuid 123.
             String message = params[0].getMessage();
             long uuid = params[0].getUuid();
-            return MessageSender.sendMessage(message, uuid);
+            return MessageSender.sendMessage(message, uuid,
+                    ((HistoryPhoneApplication) getApplication()).getHost());
         }
 
         @Override

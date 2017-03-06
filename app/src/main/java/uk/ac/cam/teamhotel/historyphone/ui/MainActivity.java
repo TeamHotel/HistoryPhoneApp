@@ -1,6 +1,7 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -11,11 +12,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 
@@ -116,6 +121,22 @@ public class MainActivity extends AppCompatActivity {
                 // demonstrating loading tiles.
                 databaseHelper.clearArtifacts();
                 Log.i(TAG, "Conversations cleared.");
+                return true;
+
+            case R.id.set_server_host:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                // Set up the text input box.
+                View view = getLayoutInflater().inflate(R.layout.dialog_host, null, false);
+                final EditText input = (EditText) view.findViewById(R.id.host_input);
+                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+                builder.setView(view);
+                // Set up the button callbacks.
+                builder.setPositiveButton("Set", (dialog, which) ->
+                        ((HistoryPhoneApplication) getApplication())
+                                .setHost(input.getText().toString()));
+                builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+                builder.show();
+                Log.i(TAG, "Prompting user to set server host.");
                 return true;
 
             default:

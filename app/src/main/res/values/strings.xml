@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">History Phone</string>
     <string name="nearby">Nearby</string>
@@ -5,6 +6,8 @@
     <string name="artifact_image">Artifact image.</string>
     <string name="artifact_description">Artifact description.</string>
     <string name="distance">%.1fm</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
     <string name="clear_conversations">Clear conversations</string>
+    <string name="set_server_host">Set server host</string>
+    <string name="hostname">Hostname</string>
 </resources>

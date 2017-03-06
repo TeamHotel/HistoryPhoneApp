@@ -9,6 +9,7 @@ public class HistoryPhoneApplication extends Application {
 
     private DatabaseHelper databaseHelper;
     private ArtifactLoader artifactLoader;
+    private String host = "localhost";
 
     @Override
     public void onCreate() {
@@ -31,5 +32,21 @@ public class HistoryPhoneApplication extends Application {
      */
     public ArtifactLoader getArtifactLoader() {
         return artifactLoader;
+    }
+
+    /**
+     * Set the hostname of the chatbot server.
+     */
+    public void setHost(String host) {
+        if (!host.equals("")) {
+            this.host = host;
+        }
+    }
+
+    /**
+     * @return the hostname of the chatbot server.
+     */
+    public String getHost() {
+        return host;
     }
 }
