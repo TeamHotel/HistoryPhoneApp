@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -38,12 +39,21 @@ public class MainActivity extends AppCompatActivity {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.ViewPager);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.TabLayout);
 
+        // Set up the action bar.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            Log.e(TAG, "Actionbar is null.");
+        } else {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setIcon(R.drawable.ic_actionbar);
+        }
+
         // Create the database helper.
-          DatabaseHelper databaseHelper = new DatabaseHelper(this);
-          databaseHelper.clearConversations();
-              databaseHelper.clearMessages();
-              databaseHelper.clearArtifacts();
-              databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        databaseHelper.clearConversations();
+        databaseHelper.clearMessages();
+        databaseHelper.clearArtifacts();
+        databaseHelper.addArtifact(new Artifact(0L, "Thing1", "Some friccin type of thingo", null));
 
         // Set up the tabbed fragment view.
         viewPager.setAdapter(new TabAdapter(getSupportFragmentManager()));

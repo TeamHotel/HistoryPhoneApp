@@ -1,9 +1,13 @@
 package uk.ac.cam.teamhotel.historyphone.ui;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +34,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter adapter;
     private List<ChatMessage> chatMessageList = new ArrayList<>();
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
@@ -51,6 +56,14 @@ public class ChatActivity extends AppCompatActivity {
             new MessageAsyncTask().execute(new MessageContainer("init", uuid));
         }
 
+        // Set up the action bar.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            Log.e(TAG, "Actionbar is null.");
+        } else {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         // Set up the adapter for the chat message list.
         ListView chatMessages = (ListView) findViewById(R.id.chat_list);
         adapter = new ChatAdapter(this, artifactLoader.load(uuid), chatMessageList);
@@ -64,6 +77,21 @@ public class ChatActivity extends AppCompatActivity {
         if (!enableChat) {
             editText.setEnabled(false);
             sendButton.setEnabled(false);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Back button in action bar was tapped.
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -100,7 +128,7 @@ public class ChatActivity extends AppCompatActivity {
     /**
      * Called when loading a conversation.
      */
-    public void loadChatListFromDB(){
+    private void loadChatListFromDB(){
         chatMessageList = databaseHelper.returnAllMessages(uuid);
     }
 

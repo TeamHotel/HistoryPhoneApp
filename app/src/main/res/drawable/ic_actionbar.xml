@@ -3,5 +3,5 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:drawable="@drawable/ic_perm_phone_msg"
-        android:right="20dp" />
+        android:right="10dp" />
 </layer-list>
