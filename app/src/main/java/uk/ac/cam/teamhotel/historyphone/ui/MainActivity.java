@@ -13,9 +13,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 
+import uk.ac.cam.teamhotel.historyphone.HistoryPhoneApplication;
 import uk.ac.cam.teamhotel.historyphone.R;
 import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
@@ -23,6 +27,8 @@ import uk.ac.cam.teamhotel.historyphone.database.DatabaseHelper;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
+
+    private DatabaseHelper databaseHelper;
 
     private static final String[] permissions = new String[] {
             Manifest.permission.BLUETOOTH,
@@ -38,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.ViewPager);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.TabLayout);
+
+        databaseHelper = ((HistoryPhoneApplication) getApplication()).getDatabaseHelper();
 
         // Set up the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -89,6 +97,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Activity created.");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_conversations:
+                databaseHelper.clearConversations();
+                databaseHelper.clearMessages();
+                // This doesn't really need to be here, but is useful for
+                // demonstrating loading tiles.
+                databaseHelper.clearArtifacts();
+                Log.i(TAG, "Conversations cleared.");
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
