@@ -23,6 +23,7 @@ import uk.ac.cam.teamhotel.historyphone.artifact.Artifact;
 import uk.ac.cam.teamhotel.historyphone.artifact.ArtifactLoader;
 import uk.ac.cam.teamhotel.historyphone.ble.BeaconScanner;
 import uk.ac.cam.teamhotel.historyphone.ble.BluetoothNotSupportedException;
+import uk.ac.cam.teamhotel.historyphone.ble.DemoBeaconScanner;
 import uk.ac.cam.teamhotel.historyphone.utils.StreamTools;
 
 import static android.app.Activity.RESULT_OK;
@@ -122,7 +123,7 @@ public class NearbyFragment extends Fragment {
         try {
             if (scanner.isBluetoothEnabled()) {
                 // If Bluetooth is currently enabled, start scanning.
-                scanner.start();
+                ((DemoBeaconScanner) scanner).start();
             } else {
                 // Otherwise, prompt the user to enable Bluetooth.
                 Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

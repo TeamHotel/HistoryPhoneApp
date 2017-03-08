@@ -7,6 +7,7 @@ import android.bluetooth.le.ScanResult;
 import android.util.Log;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -19,11 +20,11 @@ public class BeaconScanner {
 
     public static final String TAG = "BeaconScanner";
 
-    private static BeaconScanner instance;
+    protected static BeaconScanner instance;
 
     public static BeaconScanner getInstance() {
         if (instance == null) {
-            instance = new BeaconScanner();
+            instance = new DemoBeaconScanner();
         }
         return instance;
     }
@@ -36,7 +37,7 @@ public class BeaconScanner {
     /**
      * Create a new beacon stream, ready to emit beacons once scanning is started.
      */
-    private BeaconScanner() {
+    protected BeaconScanner() {
         Log.i(TAG, "Initialising beacon scanner.");
         scanning = false;
         beaconEmitters = new LinkedList<>();
@@ -152,17 +153,21 @@ public class BeaconScanner {
     /**
      * @return whether the scanner is currently scanning for beacons.
      */
-    public boolean isScanning() { return scanning; }
+    public final boolean isScanning() { return scanning; }
 
     /**
      * @return whether Bluetooth is currently enabled.
      */
-    public boolean isBluetoothEnabled() {
+    public final boolean isBluetoothEnabled() {
         return (adapter != null) && adapter.isEnabled();
     }
 
     /**
      * @return a reference to the beacon stream for observation purposes.
      */
-    public Observable<Beacon> getBeaconStream() { return beaconStream; }
+    public final Observable<Beacon> getBeaconStream() { return beaconStream; }
+
+    protected final List<ObservableEmitter<Beacon>> getEmitters() {
+        return beaconEmitters;
+    }
 }

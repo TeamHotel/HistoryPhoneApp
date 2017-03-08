@@ -68,8 +68,7 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
      */
     public void insert(Artifact artifact, float distance) {
         if (positions.containsKey(artifact.getUUID())) {
-            // Remove the entry from the contents.
-            contents.remove(positions.get(artifact.getUUID()).intValue());
+            remove(artifact);
         }
 
         // Insert, maintaining the contents' ordering by distance.
@@ -80,9 +79,12 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
                     // arbitrarily insert to the right.
                     return (distanceComparison != 0) ? distanceComparison : 1;
                 });
-        if (contents.size() > 0) {
-            contents.add(contents.get(contents.size() - 1));
-            for (int i = contents.size() - 2; i >= position; i--) {
+        int formerSize = contents.size();
+        if (position < formerSize) {
+            positions.put(contents.get(formerSize - 1).first.getUUID(), formerSize);
+            contents.add(contents.get(formerSize - 1));
+            for (int i = formerSize - 2; i >= position; i--) {
+                positions.put(contents.get(i).first.getUUID(), i + 1);
                 contents.set(i + 1, contents.get(i));
             }
             contents.set(position, new Pair<>(artifact, distance));
@@ -90,6 +92,17 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
             contents.add(new Pair<>(artifact, distance));
         }
         positions.put(artifact.getUUID(), position);
+
+        String out = "[";
+        for (Pair<Artifact, Float> item : contents) {
+            out += item.first.getUUID() + ", ";
+        }
+        out += "]\n{";
+        for (Long key : positions.keySet()) {
+            out += key + ": " + positions.get(key) + ", ";
+        }
+        out += "}";
+        Log.v(TAG, out);
 
         // Update the list view.
         notifyDataSetChanged();
@@ -105,6 +118,9 @@ public class NearbyAdapter extends ArrayAdapter<Pair<Artifact, Float>> {
      */
     public void remove(Artifact artifact) {
         if (positions.containsKey(artifact.getUUID())) {
+            for (int i = positions.get(artifact.getUUID()) + 1; i < contents.size(); i++) {
+                positions.put(contents.get(i).first.getUUID(), i - 1);
+            }
             contents.remove(positions.get(artifact.getUUID()).intValue());
             positions.remove(artifact.getUUID());
         }

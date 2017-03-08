@@ -102,15 +102,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getName(long uuid) {
+        SQLiteDatabase db = getWritableDatabase();
+
         String name = null;
 
-        try (SQLiteDatabase db = getWritableDatabase()) {
-            String nameQuery = "SELECT title FROM artifacts WHERE uuid=" + uuid;
-            try (Cursor cursor = db.rawQuery(nameQuery, null)) {
-                // Get name if the query is successful
-                if (cursor != null && cursor.moveToFirst()) {
-                    name = cursor.getString(0);
-                }
+        String nameQuery = "SELECT title FROM artifacts WHERE uuid=" + uuid;
+        try (Cursor cursor = db.rawQuery(nameQuery, null)) {
+            // Get name if the query is successful
+            if (cursor != null && cursor.moveToFirst()) {
+                name = cursor.getString(0);
             }
         }
 
@@ -119,15 +119,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getDescription(long uuid) {
+        SQLiteDatabase db = getWritableDatabase();
         String description = null;
 
-        try (SQLiteDatabase db = getWritableDatabase()) {
-            String descriptionQuery = "SELECT description FROM artifacts WHERE uuid=" + uuid;
-            try (Cursor cursor = db.rawQuery(descriptionQuery, null)) {
-                // Get name if the query is successful.
-                if (cursor != null && cursor.moveToFirst()) {
-                    description = cursor.getString(0);
-                }
+        String descriptionQuery = "SELECT description FROM artifacts WHERE uuid=" + uuid;
+        try (Cursor cursor = db.rawQuery(descriptionQuery, null)) {
+            // Get name if the query is successful.
+            if (cursor != null && cursor.moveToFirst()) {
+                description = cursor.getString(0);
             }
         }
 
